@@ -79,16 +79,30 @@
 
 				<?php foreach ($structured_questions as $q) : ?>
 					<?php if ($q->is_checkbox) : ?>
-						<?php
+						<?php // Logika Final untuk Checkbox 
 						?>
 						<?php foreach ($q->options as $option) : ?>
 							<td>
 								<?php
 								if (isset($jawaban_map[$q->ps_id])) {
-									$selected_options = array_map('trim', explode(',', $jawaban_map[$q->ps_id]));
+									$jawaban_lengkap_checkbox = $jawaban_map[$q->ps_id];
+									$selected_options = array_map('trim', explode(',', $jawaban_lengkap_checkbox));
+
 									foreach ($selected_options as $item_jawaban) {
 										if (strpos($item_jawaban, $option) === 0) {
-											echo htmlspecialchars($item_jawaban);
+											$esai_checkbox = '';
+											if (strlen($item_jawaban) > strlen($option)) {
+												$esai_checkbox = trim(substr($item_jawaban, strlen($option)));
+												$esai_checkbox = ltrim($esai_checkbox, ', ');
+											}
+
+											if (!empty($esai_checkbox)) {
+												// Jika ada esai, tampilkan HANYA esainya dengan tebal
+												echo htmlspecialchars($esai_checkbox);
+											} else {
+												// Jika tidak ada esai, tampilkan pilihan dengan tanda centang
+												echo htmlspecialchars($item_jawaban);
+											}
 											break;
 										}
 									}
@@ -97,7 +111,7 @@
 							</td>
 						<?php endforeach; ?>
 					<?php else : ?>
-						<?php
+						<?php // Logika Final untuk Radio Button & Teks 
 						?>
 						<td>
 							<?php
@@ -107,9 +121,12 @@
 									$parts = explode(',', $jawaban, 2);
 									$pilihan = trim($parts[0]);
 									$esai = trim($parts[1]);
-									echo htmlspecialchars($pilihan);
+
 									if (!empty($esai)) {
-										echo ' (<b>' . htmlspecialchars($esai) . '</b>)';
+										// Jika ada esai, tampilkan HANYA esainya dengan tebal
+										echo htmlspecialchars($esai);
+									} else {
+										echo htmlspecialchars($pilihan);
 									}
 								} else {
 									echo htmlspecialchars($jawaban);
@@ -119,7 +136,6 @@
 						</td>
 					<?php endif; ?>
 				<?php endforeach; ?>
-
 				<td>
 					<?php
 					$array_foto = json_decode($hsl->js_foto, TRUE);
@@ -130,8 +146,7 @@
 		<?php endforeach; ?>
 	</tbody>
 </table>
-
-<script src="<?= base_url() ?>/../assets/theme/assets/plugins/jquery/jquery.min.js"></script>
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 <script src="https://cdn.jsdelivr.net/gh/linways/table-to-excel@v1.0.4/dist/tableToExcel.js"></script>
 <script type="text/javascript">
 	$(document).ready(function() {
@@ -145,5 +160,4 @@
 		});
 	});
 </script>
-
 </html>
