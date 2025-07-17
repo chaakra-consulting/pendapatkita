@@ -146,7 +146,8 @@
 		<?php endforeach; ?>
 	</tbody>
 </table>
-<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script> 
+
 <script src="https://cdn.jsdelivr.net/gh/linways/table-to-excel@v1.0.4/dist/tableToExcel.js"></script>
 <script type="text/javascript">
 	$(document).ready(function() {
