@@ -1,0 +1,12 @@
+/vendor/
+*.zip
+*.rar
+*.7z
+/assets/validasi/
+/application/cache/*
+/application/logs/*
+!/application/cache/index.html
+!/application/logs/index.html
+.env
+.DS_Store
+Thumbs.db
