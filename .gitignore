@@ -5,6 +5,8 @@
 /assets/validasi/
 /application/cache/*
 /application/logs/*
+/application/config/config.php
+/application/config/database.php
 !/application/cache/index.html
 !/application/logs/index.html
 .env
