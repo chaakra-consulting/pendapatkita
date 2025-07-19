@@ -86,40 +86,69 @@
 
     <!-- Initialize Quill editor -->
     <script>
-      var quill = new Quill('#editor', {
-        theme: 'snow',
-        modules: {
-          toolbar: [
-            [{
-              header: [1, 2, 3, 4, 5, 6, false]
-            }],
-            [{
-              font: []
-            }],
-            ["bold", "italic"],
-            ["link", "blockquote", "code-block", "image"],
-            [{
-              list: "ordered"
-            }, {
-              list: "bullet"
-            }],
-            [{
-              script: "sub"
-            }, {
-              script: "super"
-            }],
-            [{
-              color: []
-            }, {
-              background: []
-            }],
-          ]
-        },
+  document.addEventListener("DOMContentLoaded", function () {
+    var quill = new Quill('#editor', {
+      theme: 'snow',
+      modules: {
+        toolbar: [
+          [{ header: [1, 2, 3, 4, 5, 6, false] }],
+          [{ font: [] }],
+          ["bold", "italic"],
+          ["link", "blockquote", "code-block", "image"],
+          [{ list: "ordered" }, { list: "bullet" }],
+          [{ script: "sub" }, { script: "super" }],
+          [{ color: [] }, { background: [] }],
+        ]
+      },
+    });
+
+    // Isi hidden input dengan isi editor setiap perubahan
+    quill.on('text-change', function(delta, oldDelta, source) {
+      document.querySelector("input[name='Pertanyaan']").value = quill.root.innerHTML;
+    });
+
+    // Jika ada nilai awal dari set_value, tempelkan ke editor
+    const initial = document.querySelector("input[name='Pertanyaan']").value;
+    if (initial) {
+      quill.clipboard.dangerouslyPasteHTML(initial);
+    }
+
+    // Untuk editor edit (loop)
+    <?php foreach ($listpertanyaan as $lu): ?>
+      let quillEditor<?= $lu->ps_id ?>;
+
+      $('#editSurvey<?= $lu->ps_id ?>').on('shown.bs.modal', function () {
+        setTimeout(() => {
+          if (!quillEditor<?= $lu->ps_id ?>) {
+              quillEditor<?= $lu->ps_id ?> = new Quill('#editor<?= $lu->ps_id ?>', {
+                  theme: 'snow',
+                  modules: {
+                      toolbar: [
+                          [{ header: [1, 2, 3, 4, 5, 6, false] }],
+                          [{ font: [] }],
+                          ["bold", "italic"],
+                          ["link", "blockquote", "code-block", "image"],
+                          [{ list: "ordered" }, { list: "bullet" }],
+                          [{ script: "sub" }, { script: "super" }],
+                          [{ color: [] }, { background: [] }]
+                      ]
+                  }
+              });
+
+              // Paste isi pertanyaan ke editor
+              quillEditor<?= $lu->ps_id ?>.clipboard.dangerouslyPasteHTML(`<?= $lu->ps_pertanyaan ?>`);
+
+              // Update hidden field saat isi berubah
+              quillEditor<?= $lu->ps_id ?>.on('text-change', function(delta, oldDelta, source) {
+                document.querySelector("#pertanyaanHidden<?= $lu->ps_id ?>").value = quillEditor<?= $lu->ps_id ?>.root.innerHTML;
+              });
+          }
+        }, 100);
       });
-      quill.on('text-change', function(delta, oldDelta, source) {
-        document.querySelector("input[name='Pertanyaan']").value = quill.root.innerHTML;
-      });
+    <?php endforeach; ?>
+  });
 </script>
+
 
   </body>
 </html>

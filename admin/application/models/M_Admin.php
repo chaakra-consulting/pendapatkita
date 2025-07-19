@@ -171,6 +171,14 @@ class M_Admin extends CI_Model
         return $this->db->query("SELECT * FROM jawaban_survey WHERE js_survey_id='" . $id . "' AND js_valid='1'");
     }
 
+    public function count_data_survey_byid($id)
+    {
+        $query = $this->db->query("SELECT COUNT(*) AS total FROM jawaban_survey WHERE js_survey_id = ? AND js_valid = '1'", [$id]);
+        $row = $query->row(); // gunakan row() bukan getRow()
+    
+        return $row->total;
+    }    
+
     function list_surveyor_kordinator()
     {
         // return $this->db->query('select surveyor.*, kelas.kode_kelas from surveyor join kelas on surveyor.kelas=kelas.id_kelas order by nis');
