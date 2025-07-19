@@ -739,24 +739,51 @@ class Admin extends CI_Controller
 		$this->session->set_flashdata('t_survey', '');
 		redirect('admin/seksi_detail/' . $id_seksi .'/'.$id_survey);
 	}
+
 	function edit_pertanyaan($id)
 	{
-
+		$where = ['ps_id' => $id];
 		$id_seksi = $this->input->post('idSeksi');
 		$id_survey = $this->input->post('idSurvey');
-		$survey = $this->input->post('nmSurvey');
-		$kode = $this->input->post('KodeSurvey');
-		$ket = $this->input->post('ketSurvey');
-		$where = ['id_seksi' => $id_seksi];
+		$kode_seksi = $this->input->post('kodeSeksi');
+		$kode = $this->input->post('KodePertanyaan'.$id);
+		$pertanyaan = $this->input->post('Pertanyaan'.$id);
+		$tipe = $this->input->post('tipePertanyaan'.$id);
+		$kewajibanMengisi = $this->input->post('kewajibanMengisi'.$id);
+
+		$pilja = $this->input->post('pilja');
+		$logicja = $this->input->post('logicja');
+		$typeja = $this->input->post('typeja');
+
+		$dataJawaban = '';
+		$pilja = $this->input->post('pilja');
+		$pilja = array_filter($pilja);
+		$pilja = array_unique($pilja);
+		$pilja = array_values($pilja); 
+		// print_r($this->input->post());exit;
+		foreach ($pilja as $key => $v) {
+			if (count($pilja) > 1) {
+				if ($v != '') {
+					$dataJawaban .= $v . ':' . $logicja[$key] . ':' . $typeja[$key] . ';';
+				}
+			} else {
+				$dataJawaban = '';
+			}
+		}
+		// print_r($dataJawaban);exit;
 		$data = [
-			'ss_kode' => $kode,
-			'ss_judul' => $survey,
-			'ss_keterangan' => $ket,
+			'ps_id_survey' => $id_survey,
+			'ps_id_seksi' => $id_seksi,
+			'ps_kode' => $kode_seksi.$kode,
+			'ps_pertanyaan' => $pertanyaan,
+			'ps_tipe_pertanyaan' => $tipe,
+			'ps_pilihan_jawaban' => $dataJawaban,
+			'must_answer' => $kewajibanMengisi ?? null,
 		];
 
-		$this->m_admin->e_survey($where, 'seksi_survey', $data);
+		$this->m_admin->e_survey($where, 'pertanyaan_survey', $data);
 		$this->session->set_flashdata('t_survey', '');
-		redirect('admin/survey_detail/' . $id_survey);
+		redirect('admin/seksi_detail/' . $id_seksi .'/'.$id_survey);
 	}
 
 	function hapus_survey($id)
@@ -851,8 +878,12 @@ function hapus_survey($id){
 		$data['title'] = 'seksi';
 		$data['infosurvey'] = $this->m_admin->list_seksi($id)->result();
 		$data['listpertanyaan'] = $this->m_admin->list_pertanyaan($id)->result();
-		//$data['listpertanyaanbysurvey'] = $this->m_admin->list_pertanyaan_by_survey($id_survey)->result();
-
+		
+		$idSurvey = $data['infosurvey'] ? $data['infosurvey'][0]->ss_id_survey : false;
+		if($idSurvey) $data['is_jawaban'] = $this->m_admin->count_data_survey_byid($idSurvey) > 0 ? true : false;
+		else $data['is_jawaban'] = false;
+		
+		// print_r($data);exit;
 		$this->header($data);
 		$this->load->view('seksi_detail');
 		$this->load->view('template/footer');
