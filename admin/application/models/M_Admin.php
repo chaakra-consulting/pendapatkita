@@ -283,6 +283,7 @@ class M_Admin extends CI_Model
 		*/
         return $this->db->get();
     }
+    
     function list_pertanyaan_by_survey($id)
     {
         $this->db->select('*');
@@ -292,6 +293,17 @@ class M_Admin extends CI_Model
         
         return $this->db->get();
     }
+
+    function pertanyaan_by_id($id)
+    {
+        return $this->db->select('*')
+            ->from('pertanyaan_survey')
+            ->where('ps_id', $id)
+            ->where('ps_status', 0)
+            ->get()
+            ->row(); // ambil hanya 1 baris
+    }
+
     //Tambah ujian
     function t_survey($table, $data)
     {
