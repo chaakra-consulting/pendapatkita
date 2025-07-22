@@ -392,8 +392,8 @@
                                                                                             }
                                                                                         }
                                                                                         elseif ($ta->ps_tipe_pertanyaan == 3) {
+                                                                                            $typeData = $ta->type_data ?? 'text';
                                                                                             $pilja = explode(';', $piljab);
-                                                                                            // print_r($pilja);exit;
                                                                                             foreach ($pilja as $pj) {
                                                                                                 if ($pj != '') {
                                                                                                     $pillo = explode(':', $pj);
@@ -422,7 +422,7 @@
                                                                                             }
                                                                                             $isRequired = ($ta->must_answer == 'required') ? 'true' : 'false';
                                                                                             $paklo = '';
-                                                                                            $pakwar = '<p class="form-control-static"><input type="text" class="form-control"  name="' . $ta->ps_id . '" data-psid="' . $ta->ps_id . '" data-required="' . $isRequired . '"></p>';
+                                                                                            $pakwar = '<p class="form-control-static"><input type="'.$typeData.'" class="form-control"  name="' . $ta->ps_id . '" data-psid="' . $ta->ps_id . '" data-required="' . $isRequired . '"></p>';
                                                                                         }	
                                                                                         elseif ($ta->ps_tipe_pertanyaan == 4) {
                                                                                             $pilja = explode(';', $piljab);
@@ -454,7 +454,7 @@
                                                                                             }
                                                                                             $isRequired = ($ta->must_answer == 'required') ? 'true' : 'false';
                                                                                             $paklo = '';
-                                                                                            $pakwar = '<p class="form-control-static"><textarea class="form-control"  name="' . $ta->ps_id . '" rows="5" data-psid="' . $ta->ps_id . '" data-required="' . $isRequired . '"></textarea>';
+                                                                                            $pakwar = '<p class="form-control-static"><textarea class="form-control"   name="' . $ta->ps_id . '" rows="5" data-psid="' . $ta->ps_id . '" data-required="' . $isRequired . '"></textarea>';
                                                                                             // $lnk2 = $lnk;
                                                                                         } 
                                                                                         elseif ($ta->ps_tipe_pertanyaan == 5) {
