@@ -80,7 +80,7 @@ function tipepertanyaan($idtipe)
                             </div>
                             <div class="form-group">
                                 <label for="tipePertanyaan">Tipe Pertanyaan :</label>
-                                <select name="tipePertanyaan" id="tipePertanyaan" onchange="showDiv('div',this)" class="form-control" required>
+                                <select name="tipePertanyaan" id="tipePertanyaan" onchange="handleTipePertanyaanChange(this)" class="form-control" required>
                                     <option value="1">Pilihan Ganda - Radio</option>
                                     <option value="2">Pilihan Ganda - Checkbox</option>
                                     <option value="3">Jawaban Singkat</option>
@@ -143,15 +143,15 @@ function tipepertanyaan($idtipe)
                             </div>
                             <div id="div3" style="display:none;">
                                 <div id="InpTextContainer"></div>
-                                <div class="col-sm-3">
+                                <!-- <div class="col-sm-3">
                                     <p><button type="button" class="btn btn-default btn-block" onclick="extraInpText()" style="margin-top:6px;"><i class="fa fa-plus"></i> Tambahkan Logic</button></p>
-                                </div>
+                                </div> -->
                             </div>
                             <div id="div4" style="display:none;">
                                 <div id="InpTextAreaContainer"></div>
-                                <div class="col-sm-3">
+                                <!-- <div class="col-sm-3">
                                     <p><button type="button" class="btn btn-default btn-block" onclick="extraInpTextArea()" style="margin-top:6px;"><i class="fa fa-plus"></i> Tambahkan Logic</button></p>
-                                </div>
+                                </div> -->
                             </div>
                             <div id="div5" style="display:none;">
                                 <div class="form-group row">
@@ -410,15 +410,41 @@ function tipepertanyaan($idtipe)
                                                                 </div> -->
                                                             </div>
                                                             <div id="div3<?= $lu->ps_id ?>" style="display:none;">
+                                                                <?php
+                                                        			$parts = explode(':', rtrim($lu->ps_pilihan_jawaban, ';'), 3);
+                                                                    $logic3 = $parts[1] ?? '';
+                                                                ?>
                                                                 <div id="InpTextContainer<?= $lu->ps_id ?>"></div>
-                                                                <br>
+                                                                <div class="form-group row">
+                                                                    <div class="col-sm-9">
+                                                                        <select name="type_data<?= $lu->ps_id ?>" id="type_data<?= $lu->ps_id ?>" class="form-control" required>
+                                                                            <option value="text" <?= $lu->type_data == 'text' ? ' selected' : '' ?>>Text</option>
+                                                                            <option value="number" <?= $lu->type_data == 'number' ? ' selected' : '' ?>>Number</option>
+                                                                        </select>
+                                                                    </div>
+                                                                    <div class="col-sm-3">
+                                                                        <p class="form-control-static">
+                                                                            <input type="text" class="form-control" name="logic_3<?= $lu->ps_id ?>" value="<?= $logic3 ?>" placeholder="Logic">
+                                                                        </p>
+                                                                    </div>
+                                                                </div>
                                                                 <!-- <div class="col-sm-3">
                                                                     <p><button type="button" class="btn btn-default btn-block" onclick="extraInpTextEdit('<?= $lu->ps_id ?>')" style="margin-top:6px;"><i class="fa fa-plus"></i> Tambahkan Logic</button></p>
                                                                 </div> -->
                                                             </div>
                                                             <div id="div4<?= $lu->ps_id ?>" style="display:none;">
+                                                                <?php
+                                                        			$parts = explode(':', rtrim($lu->ps_pilihan_jawaban, ';'), 3);
+                                                                    $logic4 = $parts[1] ?? '';
+                                                                ?>
                                                                 <div id="InpTextAreaContainer<?= $lu->ps_id ?>"></div>
-                                                                <br>
+                                                                <div class="form-group row">
+                                                                    <div class="col-sm-3">
+                                                                        <p class="form-control-static">
+                                                                            <input type="text" class="form-control" name="logic_4<?= $lu->ps_id ?>" value="<?= $logic4 ?>" placeholder="Logic">
+                                                                        </p>
+                                                                    </div>
+                                                                </div>
                                                                 <!-- <div class="col-sm-3">
                                                                     <p><button type="button" class="btn btn-default btn-block" onclick="extraInpTextAreaEdit('<?= $lu->ps_id ?>')" style="margin-top:6px;"><i class="fa fa-plus"></i> Tambahkan Logic</button></p>
                                                                 </div> -->
@@ -675,6 +701,20 @@ function tipepertanyaan($idtipe)
         }
     }
 
+    function handleTipePertanyaanChange(selectEl) {
+        const value = selectEl.value;
+        
+        showDiv('div', selectEl);
+
+        if (value === "3") {
+            extraTypeDataText();
+        } else if (value === "4") {
+            extraTypeDataTextArea();
+        } else {
+            $("#InpTextAreaContainer").empty();
+        }
+    }
+
     function displayDiv(prefix, suffix) {
         var div = document.getElementById(prefix + suffix);
         div.style.display = 'block';
@@ -742,12 +782,44 @@ function tipepertanyaan($idtipe)
     }
 
     function extraInpText() {
-        $("#InpTextContainer").append('<input type="hidden" id="pilja" name="pilja[]" value="jawaban singkat"><div class="col-sm-2"><p class="form-control-static"><input type="text" class="form-control" id="logicja" name="logicja[]" placeholder="Logic"></p></div>');
+        $("#InpTextContainer").append('<div class="row justify-content-center" style="margin-bottom:10px;"><input type="hidden" id="pilja" name="pilja[]" value="jawaban singkat"><div class="col-sm-2"><p class="form-control-static"><input type="text" class="form-control" id="logicja" name="logicja[]" placeholder="Logic"></p></div></div>');
         // $("#PilGandaCheckContainer").append('<div class="form-group row"><label class="col-sm-2 control-label">&nbsp</label><div class="col-sm-4"><p class="form-control-static"><input type="text" class="form-control" id="pilja" name="pilja[]" placeholder="Pilihan Jawaban"></p> </div>  <div class="col-sm-2"> <p class="form-control-static"><input type="text" class="form-control" id="logicja" name="logicja[]" placeholder="Logic"></p> </div>  <div class="col-sm-3"> </div> </div>');
     }
 
     function extraInpTextArea() {
-        $("#InpTextAreaContainer").append('<input type="hidden" id="pilja" name="pilja[]" value="jawaban panjang"><div class="col-sm-2"><p class="form-control-static"><input type="text" class="form-control" id="logicja" name="logicja[]" placeholder="Logic"></p></div>');
+        $("#InpTextAreaContainer").append('<div class="row justify-content-center" style="margin-bottom:10px;"><input type="hidden" id="pilja" name="pilja[]" value="jawaban panjang"><div class="col-sm-2"><p class="form-control-static"><input type="text" class="form-control" id="logicja" name="logicja[]" placeholder="Logic"></p></div></div>');
+    }
+
+    function extraTypeDataText() {
+        $("#InpTextContainer").append(`
+            <div class="form-group row">
+                <div class="col-sm-9">
+                    <select name="type_data" id="type_data" class="form-control" required>
+                        <option value="text">Text</option>
+                        <option value="number">Number</option>
+                    </select>
+                </div>
+                <input type="hidden" name="typeja[]" value="">
+                <input type="hidden"name="pilja[]" value="jawaban singkat">
+                <div class="col-sm-3">
+                    <p class="form-control-static"><input type="text" class="form-control" name="logicja[]" placeholder="Logic"></p>
+                </div>
+            </div>
+        `);
+    }
+
+    function extraTypeDataTextArea() {
+        $("#InpTextAreaContainer").html(`
+            <div class="form-group row">
+                <div class="row justify-content-center" style="margin-top:10px;">
+                    <input type="hidden" name="typeja[]" value="">
+                    <input type="hidden" id="pilja" name="pilja[]" value="jawaban panjang">
+                    <div class="col-sm-5">
+                        <p class="form-control-static"><input type="text" class="form-control" id="logicja" name="logicja[]" placeholder="Logic"></p>
+                    </div>
+                </div>
+            </div>
+        `);
     }
 
     function extraTicketAttachment() {

@@ -701,6 +701,7 @@ class Admin extends CI_Controller
 		$pertanyaan = $this->input->post('Pertanyaan');
 		$tipe = $this->input->post('tipePertanyaan');
 		$kewajibanMengisi = $this->input->post('kewajibanMengisi');
+		$typeData = $this->input->post('type_data');
 
 		$pilja = $this->input->post('pilja');
 		$logicja = $this->input->post('logicja');
@@ -720,7 +721,6 @@ class Admin extends CI_Controller
 			}
 		}
 
-
 		$data = [
 			'ps_id_survey' => $id_survey,
 			'ps_id_seksi' => $id_seksi,
@@ -728,6 +728,7 @@ class Admin extends CI_Controller
 			'ps_pertanyaan' => $pertanyaan,
 			'ps_tipe_pertanyaan' => $tipe,
 			'ps_pilihan_jawaban' => $dataJawaban,
+			'type_data' => $typeData ?? null,
 			'must_answer' => $kewajibanMengisi ?? null,
 			'ps_creator' => $idUser,
 			'ps_create' => date("Y-m-d H:i:s"),
@@ -743,6 +744,7 @@ class Admin extends CI_Controller
 	function edit_pertanyaan($id)
 	{
 		$where = ['ps_id' => $id];
+		$old_data = $this->m_admin->pertanyaan_by_id($id);
 		$id_seksi = $this->input->post('idSeksi');
 		$id_survey = $this->input->post('idSurvey');
 		$kode_seksi = $this->input->post('kodeSeksi');
@@ -750,27 +752,41 @@ class Admin extends CI_Controller
 		$pertanyaan = $this->input->post('Pertanyaan'.$id);
 		$tipe = $this->input->post('tipePertanyaan'.$id);
 		$kewajibanMengisi = $this->input->post('kewajibanMengisi'.$id);
+		$type_data = $this->input->post('type_data'.$id);
 
 		$pilja = $this->input->post('pilja');
 		$logicja = $this->input->post('logicja');
 		$typeja = $this->input->post('typeja');
-
 		$dataJawaban = '';
-		$pilja = $this->input->post('pilja');
-		$pilja = array_filter($pilja);
-		$pilja = array_unique($pilja);
-		$pilja = array_values($pilja); 
-		// print_r($this->input->post());exit;
-		foreach ($pilja as $key => $v) {
-			if (count($pilja) > 1) {
-				if ($v != '') {
-					$dataJawaban .= $v . ':' . $logicja[$key] . ':' . $typeja[$key] . ';';
-				}
-			} else {
-				$dataJawaban = '';
+		if(is_array($pilja)) {
+			$pilja = $this->input->post('pilja');
+			$pilja = array_filter($pilja);
+			$pilja = array_unique($pilja);
+			$pilja = array_values($pilja); 
+
+			foreach ($pilja as $key => $v) {
+				if (count($pilja) > 1) {
+					if ($v != '') {
+						$dataJawaban .= $v . ':' . $logicja[$key] . ':' . $typeja[$key] . ';';
+					}
+				} 
+			}
+		}else {
+			if($tipe == 3 || $tipe == 4) {
+				$logic_new = $this->input->post('logic_'.$tipe.$id);
+				$cleaned = explode(';', $old_data->ps_pilihan_jawaban)[0];
+				$parts = explode(':', $cleaned, 3);
+
+				$isi   = $tipe == 3 ? 'jawaban singkat' : 'jawaban panjang';
+				$logic = $logic_new ?? $parts[1];
+				$type  = '';
+				$dataJawaban = $isi . ':' . $logic . ':' . $type . ';';
+
+			}else{
+				$dataJawaban = $old_data->ps_pilihan_jawaban;
 			}
 		}
-		// print_r($dataJawaban);exit;
+
 		$data = [
 			'ps_id_survey' => $id_survey,
 			'ps_id_seksi' => $id_seksi,
@@ -778,6 +794,7 @@ class Admin extends CI_Controller
 			'ps_pertanyaan' => $pertanyaan,
 			'ps_tipe_pertanyaan' => $tipe,
 			'ps_pilihan_jawaban' => $dataJawaban,
+			'type_data' => $type_data ?? null,
 			'must_answer' => $kewajibanMengisi ?? null,
 		];
 
