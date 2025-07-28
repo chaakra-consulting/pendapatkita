@@ -559,10 +559,10 @@
                                                                                                 <div class="border-0 p-0 box-example-movie mb-5">
                                                                                             <div class="box-body">
                                                                                                 <select id="example-movie" name="' . $ta->ps_id . '" autocomplete="off" data-psid="'.$ta->ps_id.'" data-required="' . $isRequired . '">
-                                                                                                    <option value="buruk"' . $se[0] . '>Buruk</option>
-                                                                                                    <option value="biasa"' . $se[1] . '>Biasa Saja</option>
-                                                                                                    <option value="bagus"' . $se[2] . '>Bagus</option>
-                                                                                                    <option value="luar biasa"' . $se[3] . '>Luar Biasa</option>
+                                                                                                    <option value="buruk">Buruk</option>
+                                                                                                    <option value="biasa">Biasa Saja</option>
+                                                                                                    <option value="bagus">Bagus</option>
+                                                                                                    <option value="luar biasa">Luar Biasa</option>
                                                                                                 </select>
                                                                                                                                 </div>
                                                                                                                             </div>';

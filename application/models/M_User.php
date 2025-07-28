@@ -126,6 +126,7 @@ class M_User extends CI_Model
 		$this->db->from('pertanyaan_survey');
 		$this->db->where('ps_id_seksi', $id);
 		$this->db->where('ps_status', 0);
+		$this->db->order_by('ps_kode', 'ASC');
 		/*
 			if($id==TRUE){
 				$this->db->where('id_seksi',$id);
