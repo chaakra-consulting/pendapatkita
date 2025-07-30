@@ -263,7 +263,7 @@ class M_Admin extends CI_Model
 		$this->db->from('pertanyaan_survey');
 		$this->db->where('ps_id_seksi', $id);
 		$this->db->where('ps_status', 0);
-        $this->db->order_by('ps_kode', 'ASC');
+        // $this->db->order_by('ps_kode', 'ASC');
 		/*
 			if($id==TRUE){
 				$this->db->where('id_seksi',$id);
@@ -277,7 +277,7 @@ class M_Admin extends CI_Model
         $this->db->from('pertanyaan_survey');
         $this->db->where('ps_id_seksi', $id);
         $this->db->where('ps_status', 0);
-        $this->db->order_by('ps_kode', 'ASC');
+        // $this->db->order_by('ps_kode', 'ASC');
         /*
 			if($id==TRUE){
 				$this->db->where('id_seksi',$id);
@@ -310,6 +310,7 @@ class M_Admin extends CI_Model
     function t_survey($table, $data)
     {
         $this->db->insert($table, $data);
+        return $this->db->insert_id();
     }
 
         //Duplikat
@@ -347,6 +348,19 @@ class M_Admin extends CI_Model
         $this->db->select('*');
         $this->db->from('pool_data');
         $this->db->where('is_deleted', 0);
+        return $this->db->get();
+    }
+
+    function list_pool_data_by_id($id = null)
+    {
+        $this->db->select('*');
+        $this->db->from('pool_data');
+        $this->db->where('is_deleted', 0);
+
+        if ($id) {
+            $this->db->where('id_pool_data', $id);
+        }
+
         return $this->db->get();
     }
 
