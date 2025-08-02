@@ -484,7 +484,7 @@
 																					$lnk2 = $lnk;
 																				}
 																			}
-																			$
+
 																			$isRequired = ($ta->must_answer == 'required') ? 'true' : 'false';
 																			$paklo = '';
 																			$pakwar = '<p class="form-control-static"><input type="'.$typeData.'" class="form-control"  name="' . $ta->ps_id . '" value="' . $PilJabIsi . '" data-psid="' . $ta->ps_id . '" data-required="' . $isRequired . '"></p>';
@@ -790,6 +790,10 @@
 						currentElement.style.display = '';
 						currentElement.querySelectorAll('input, textarea, select').forEach(input => {
 							input.disabled = false;
+							if (input.hasAttribute('data-original-required')) {
+								input.setAttribute('data-required', input.getAttribute('data-original-required'));
+								input.removeAttribute('data-original-required');
+							}
 						});
 					}
 					currentElement = currentElement.nextElementSibling;
@@ -808,6 +812,12 @@
 						currentElement.style.display = 'none';
 						currentElement.querySelectorAll('input, textarea, select').forEach(input => {
 							input.disabled = true;
+
+							if (input.hasAttribute('data-required')) {
+								input.setAttribute('data-original-required', input.getAttribute('data-required'));
+								input.removeAttribute('data-required');
+							}
+							input.removeAttribute('required'); 
 						});
 					}
 					currentElement = currentElement.nextElementSibling;
@@ -963,20 +973,24 @@
 					}
 				}
 
-				form.querySelectorAll('[data-required="true"]').forEach(input => {
+				form.querySelectorAll('[data-required]').forEach(input => {
 					const tag = input.tagName.toLowerCase();
-					const type = input.type;
-					const value = input.value?.trim() ?? '';
+					const type = (input.type || '').toLowerCase();
+					const value = (input.value || '').trim();
 
-					if (
-						(tag === 'input' && type === 'text' && value === '') ||
-						(tag === 'textarea' && value === '') ||
-						(tag === 'select' && value === '')
-					) {
-						isValid = false;
-						const psid = input.dataset.psid;
-						const qDiv = document.getElementById('pertanyaan_' + psid);
-						if (qDiv) qDiv.classList.add('has-error');
+					const isRequired = input.dataset.required?.toLowerCase() === 'true';
+
+					if (isRequired) {
+						if (
+							(tag === 'input' && type !== 'radio' && type !== 'checkbox' && value === '') ||
+							(tag === 'textarea' && value === '') ||
+							(tag === 'select' && (value === '' || value === null))
+						) {
+							isValid = false;
+							const psid = input.dataset.psid;
+							const qDiv = document.getElementById('pertanyaan_' + psid);
+							if (qDiv) qDiv.classList.add('has-error');
+						}
 					}
 				});
 
