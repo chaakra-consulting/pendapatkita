@@ -47,6 +47,11 @@
                   <a href="<?=base_url();?>admin/hasilsurvey" class="menu-link">
                     <div data-i18n="Hasil Survey">Hasil Survey</div>
                   </a>
+                  <?php if ($this->session->status == 'admin') { ?>
+                    <a href="<?=base_url();?>admin/pool_data" class="menu-link">
+                      <div data-i18n="Pool Data">Pool Data</div>
+                    </a>
+                  <?php } ?>
                 </li>
               </ul>
             </li>
