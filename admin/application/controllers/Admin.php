@@ -851,22 +851,48 @@ class Admin extends CI_Controller
 		$pilja = $this->input->post('pilja');
 		$logicja = $this->input->post('logicja');
 		$typeja = $this->input->post('typeja');
+
 		$dataJawaban = '';
-		if(is_array($pilja)) {
-			$pilja = $this->input->post('pilja');
-			$pilja = array_filter($pilja);
-			$pilja = array_unique($pilja);
-			$pilja = array_values($pilja); 
+
+		// Ambil pilihan lama dalam bentuk array
+		$old_pilihan = [];
+		if (!empty($old_data->ps_pilihan_jawaban)) {
+			$old_parts = explode(';', rtrim($old_data->ps_pilihan_jawaban, ';'));
+			foreach ($old_parts as $part) {
+				$exp = explode(':', $part);
+				if (!empty($exp[0])) {
+					$old_pilihan[$exp[0]] = [
+						'logic' => $exp[1] ?? '',
+						'type'  => $exp[2] ?? '',
+					];
+				}
+			}
+		}
+
+		// Bersihkan data baru dari form
+		if (is_array($pilja)) {
+			$pilja   = array_filter(array_map('trim', $pilja));
+			$pilja   = array_unique($pilja);
+			$pilja   = array_values($pilja);
 
 			foreach ($pilja as $key => $v) {
-				if (count($pilja) > 1) {
-					if ($v != '') {
-						$dataJawaban .= $v . ':' . $logicja[$key] . ':' . $typeja[$key] . ';';
+				if ($v !== '') {
+					// Jika ada di pilihan lama → pakai logic & type lama
+					if (isset($old_pilihan[$v])) {
+						$logic = $logicja[$key] ?? $old_pilihan[$v]['logic'];
+						$type  = $typeja[$key] ?? $old_pilihan[$v]['type'];
+					} else {
+						// Jika jawaban baru -> pakai input sekarang (atau default)
+						$logic = $logicja[$key] ?? '';
+						$type  = $typeja[$key] ?? 'default';
 					}
-				} 
+
+					$dataJawaban .= $v . ':' . $logic . ':' . $type . ';';
+				}
 			}
-		}else {
-			if($tipe == 3 || $tipe == 4) {
+		} else {
+			// jika bukan multiple choice (misalnya essai)
+			if ($tipe == 3 || $tipe == 4) {
 				$logic_new = $this->input->post('logic_'.$tipe.$id);
 				$cleaned = explode(';', $old_data->ps_pilihan_jawaban)[0];
 				$parts = explode(':', $cleaned, 3);
@@ -875,8 +901,7 @@ class Admin extends CI_Controller
 				$logic = $logic_new ?? $parts[1];
 				$type  = '';
 				$dataJawaban = $isi . ':' . $logic . ':' . $type . ';';
-
-			}else{
+			} else {
 				$dataJawaban = $old_data->ps_pilihan_jawaban;
 			}
 		}

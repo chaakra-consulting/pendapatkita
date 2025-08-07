@@ -169,12 +169,22 @@
 								}
 								?>
 							</td>  
-                             <td>
-                                <a href="<?=base_url()?>admin/seksi_detail/<?=$lu->id_seksi;?>/<?=$lu->ss_id_survey;?>"><button class="btn btn-sm btn-success"><i class="fa fa-bars"></i> List Pertanyaan</button></a> 
-                                <button class="btn btn-sm btn-warning" data-bs-toggle="modal" data-bs-target="#edit<?=$lu->id_seksi;?>"><i class="fa fa-edit"></i> Edit</button>
-                                <button class="btn btn-sm btn-success" data-bs-toggle="modal" data-bs-target="#duplikat<?=$lu->id_seksi;?>"><i class="fa fa-edit"></i> Duplikat</button>
-                                <button class="btn btn-sm btn-danger" data-bs-toggle="modal" data-bs-target="#hapusSurvey<?=$lu->id_seksi;?>"><i class="fa fa-trash"></i> Hapus</button>
-                                <button class="btn btn-sm btn-info" data-bs-toggle="modal" data-bs-target="#pratinjau<?=$lu->id_seksi;?>"><i class="fa fa-eye"></i> Pratinjau</button>
+                            <td>
+                                <button class="btn btn-sm btn-warning my-1" data-bs-toggle="modal" data-bs-target="#edit<?=$lu->id_seksi;?>">
+                                    <i class="fa fa-edit"></i> Edit
+                                </button>
+                                <button class="btn btn-sm btn-danger my-1" data-bs-toggle="modal" data-bs-target="#hapusSurvey<?=$lu->id_seksi;?>">
+                                    <i class="fa fa-trash"></i> Hapus
+                                </button>
+                                <button class="btn btn-sm btn-primary my-1" data-bs-toggle="modal" data-bs-target="#duplikat<?=$lu->id_seksi;?>">
+                                    <i class="fa fa-edit"></i> Duplikat
+                                </button>
+                                <a href="<?=base_url()?>admin/seksi_detail/<?=$lu->id_seksi;?>/<?=$lu->ss_id_survey;?>">
+                                    <button class="btn btn-sm btn-success my-1"><i class="fa fa-bars"></i> List Pertanyaan</button>
+                                </a> 
+                                <button class="btn btn-sm btn-info my-1" data-bs-toggle="modal" data-bs-target="#pratinjau<?=$lu->id_seksi;?>">
+                                    <i class="fa fa-eye"></i> Pratinjau
+                                </button>
                             </td>
                         </tr>
 
