@@ -154,9 +154,9 @@
 														<a href="<?=base_url()?>admin/generate_token/<?=$lu->id_survey;?>"><button class="btn btn-sm btn-success"><i class="fa fa-menu"></i> Generate Token</button></a>
 													</td>
 													<td>
-													<a href="<?=base_url()?>admin/survey_detail/<?=$lu->id_survey;?>"><button class="btn btn-sm btn-success"><i class="fa fa-menu"></i> Detail</button></a>
-													<a href="<?=base_url()?>survey/edit/<?=$lu->id_survey;?>"><button class="btn btn-sm btn-warning"><i class="fa fa-edit"></i> Edit</button></a>
-													<button class="btn btn-sm btn-danger" data-bs-toggle="modal" data-bs-target="#hapusSurvey<?=$lu->id_survey;?>"><i class="fa fa-trash"></i> Hapus</button>
+													<a href="<?=base_url()?>admin/survey_detail/<?=$lu->id_survey;?>"><button class="btn btn-sm btn-success my-1"><i class="fa fa-bars"></i> Detail</button></a>
+													<a href="<?=base_url()?>survey/edit/<?=$lu->id_survey;?>"><button class="btn btn-sm btn-warning my-1"><i class="fa fa-edit"></i> Edit</button></a>
+													<button class="btn btn-sm btn-danger my-1" data-bs-toggle="modal" data-bs-target="#hapusSurvey<?=$lu->id_survey;?>"><i class="fa fa-trash"></i> Hapus</button>
 												</td>
 											</tr>
 											

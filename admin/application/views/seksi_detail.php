@@ -190,6 +190,294 @@ function tipepertanyaan($idtipe)
             </div>
         </div>
     </div>
+    <?php foreach ($listpertanyaan as $lu) { ?>
+    <div class="modal fade" id="editSurvey<?= $lu->ps_id; ?>">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h6 class="modal-title"> Edit Pertanyaan Survey</h6>
+                    <button aria-label="Close" class="close" data-bs-dismiss="modal" type="button"><span aria-hidden="true">×</span></button>
+                </div>
+                <div class="modal-body">
+                    <form id="formEdit<?=$lu->ps_id?>" action="<?= base_url(); ?>admin/edit_pertanyaan/<?=$lu->ps_id?>" method="POST">
+                        <div class="box-body">
+                            <div class="form-group">
+                                <label for="KodePertanyaan">Kode Pertanyaan :</label>
+                                <div class="input-group">
+                                    <div class="input-group-prepend">
+                                        <span class="input-group-text"><?= $infosurvey[0]->ss_kode ?></span>
+                                    </div>
+                                    <input type="text" name="KodePertanyaan<?= $lu->ps_id ?>" value="<?= str_replace($infosurvey[0]->ss_kode, '', $lu->ps_kode); ?>" class="form-control" placeholder="Isi kode akhir">
+                                </div>
+                            </div>
+                            <div class="form-group" style="align-items: center;">
+                                <label for="kewajibanMengisi">Kewajiban Mengisi :</label>              
+                                <select name="kewajibanMengisi<?= $lu->ps_id ?>" id="kewajibanMengisi<?= $lu->ps_id ?>" class="form-control">
+                                    <option value="" <?= $lu->must_answer == '' ? 'selected' : '' ?>>Tidak Wajib</option>    
+                                    <option value="required" <?= $lu->must_answer == 'required' ? 'selected' : '' ?>>Wajib Diisi</option>
+                                    <!-- <option value="required_if">Required dengan Logic</option> -->
+                                </select>
+                            </div>
+                            <div class="form-group">
+                                <label for="Pertanyaan">Pertanyaan :</label>
+                                <input type="hidden" name="Pertanyaan<?= $lu->ps_id ?>" id="pertanyaanHidden<?= $lu->ps_id ?>" value="<?= set_value('Pertanyaan') ?>">
+                                <div id="editor<?= $lu->ps_id ?>" style="min-height: 160px;"><?= $lu->ps_pertanyaan ?></div>
+                            </div>
+                            <div class="form-group">
+                                <label for="tipePertanyaan">Tipe Pertanyaan :</label>
+                                <select name="tipePertanyaan<?= $lu->ps_id ?>" id="tipePertanyaan<?= $lu->ps_id ?>" onchange="showDivEdit('div', this, '<?= $lu->ps_id ?>')" class="form-control" <?= $is_jawaban == 1 ? 'disabled' : '' ?> required>
+                                    <option value="1"<?= $lu->ps_tipe_pertanyaan == '1' ? 'selected' : '' ?>>Pilihan Ganda - Radio</option>
+                                    <option value="2"<?= $lu->ps_tipe_pertanyaan == '2' ? 'selected' : '' ?>>Pilihan Ganda - Checkbox</option>
+                                    <option value="3"<?= $lu->ps_tipe_pertanyaan == '3' ? 'selected' : '' ?>>Jawaban Singkat</option>
+                                    <option value="4"<?= $lu->ps_tipe_pertanyaan == '4' ? 'selected' : '' ?>>Jawaban Panjang</option>
+                                    <option value="5"<?= $lu->ps_tipe_pertanyaan == '5' ? 'selected' : '' ?>>Skala Likert</option>
+                                </select>
+                                <?php if ($is_jawaban == 1): ?>
+                                <input type="hidden" name="tipePertanyaan<?= $lu->ps_id ?>" value="<?= $lu->ps_tipe_pertanyaan ?>">
+                                <?php endif; ?>
+                            </div>
+                            <div id="div1<?= $lu->ps_id ?>" style="display:none;">
+                                <?php
+                                $piljas = explode(';', rtrim($lu->ps_pilihan_jawaban, ';'));
+                                $count = false;
+                                $index = 0;
+                                foreach ($piljas as $index => $pj) {
+                                    $parts = explode(':', $pj);
+                                    $isi   = $parts[0] ?? '';
+                                    $logic = $parts[1] ?? '';
+                                    $type  = $parts[2] ?? 'default';
+                                    $rowId = "jawabanRadioRow{$lu->ps_id}_$index";
+                                ?>
+                                <div class="form-group row" id="<?= $rowId ?>">
+                                    <input type="hidden" name="indexja[]" value="<?= $index; ?>">
+                                    <?php if ($count == false) { ?>
+                                        <label class="col-sm-2 control-label">Jawaban</label>
+                                    <?php } else { ?>
+                                        <label class="col-sm-2 control-label">&nbsp;</label>
+                                    <?php } ?>
+                                    <?php if ($is_jawaban == 1): ?>
+                                    <div class="col-sm-2">
+                                        <p class="form-control-static">
+                                        <input type="text" class="form-control" name="typeja[]" value="<?= $type ?>" readonly>
+                                        </p>
+                                    </div>
+                                    <?php else: ?>
+                                    <div class="col-sm-2">
+                                        <p class="form-control-static">
+                                            <select name="typeja[]" class="form-control">
+                                                <option value="default"<?= $type == 'default' ? ' selected' : '' ?>>Default</option>
+                                                <option value="essai"<?= $type == 'essai' ? ' selected' : '' ?>>Essai</option>
+                                            </select>
+                                        </p>
+                                    </div>
+                                    <?php endif; ?>
+                                    <div class="col-sm-3">
+                                        <p class="form-control-static">
+                                            <input type="text" class="form-control" name="pilja[]" value="<?= $isi ?>" placeholder="Pilihan Jawaban" <?= $is_jawaban == 1 ? 'readonly' : '' ?>>
+                                        </p>
+                                    </div>
+                                    <div class="col-sm-2">
+                                        <p class="form-control-static">
+                                            <input type="text" class="form-control" name="logicja[]" value="<?= $logic ?>" placeholder="Logic" <?= $is_jawaban == 1 ? 'readonly' : '' ?>>
+                                        </p>
+                                    </div>
+                                    <?php if ($is_jawaban == 0): ?>
+                                    <div class="col-sm-3">
+                                        <button type="button" class="btn btn-danger btn-block" onclick="removeJawabanRow('<?= $rowId ?>')">
+                                            <i class="fa fa-trash"></i>
+                                        </button>
+                                    </div>
+                                    <?php endif; ?>
+                                </div>
+                                <?php 
+                                    $count = true; 
+                                    $index++;
+                                } ?>
+                                <div id="PilGandaRadioContainer<?= $lu->ps_id ?>"></div>
+                                <div style="text-align: center; margin-top: 1rem;">
+                                    <button type="button" class="btn btn-default btn-block" onclick="extraPilGandaRadioEdit('<?= $lu->ps_id ?>')">
+                                        <i class="fa fa-plus"></i> Tambahkan
+                                    </button>
+                                </div>
+                            </div>
+                            <div id="div2<?= $lu->ps_id ?>" style="display:none;">
+                                <?php
+                                $piljas = explode(';', rtrim($lu->ps_pilihan_jawaban, ';'));
+                                $count = false;
+                                $index = 0;
+                                foreach ($piljas as $pj) {
+                                    $parts = explode(':', $pj);
+
+                                    $isi   = $parts[0] ?? '';
+                                    $logic = $parts[1] ?? '';
+                                    $type  = $parts[2] ?? 'default'; ;
+                                    $rowId = "jawabanCheckRow{$lu->ps_id}_$index";
+                                ?>
+                                <div class="form-group row" id="<?= $rowId ?>">
+                                <?php if($count == false) { ?>
+                                    <label class="col-sm-2 control-label">Jawaban</label>
+                                    <?php } else {?>
+                                        <label class="col-sm-2 control-label">&nbsp</label>
+                                    <?php } ?>
+                                    <?php if ($is_jawaban == 1): ?>
+                                    <div class="col-sm-2">
+                                        <p class="form-control-static">
+                                        <input type="text" class="form-control" name="typeja[]" value="<?= $type ?>" readonly>
+                                        </p>
+                                    </div>
+                                    <?php else: ?>
+                                    <div class="col-sm-2">
+                                        <p class="form-control-static">
+                                            <select name="typeja[]" class="form-control">
+                                                <option value="default"<?= $type == 'default' ? ' selected' : '' ?>>Default</option>
+                                                <option value="essai"<?= $type == 'essai' ? ' selected' : '' ?>>Essai</option>
+                                            </select>
+                                        </p>
+                                    </div>
+                                    <?php endif; ?>
+                                    <div class="col-sm-3">
+                                        <p class="form-control-static"><input type="text" class="form-control" id="pilja" name="pilja[]" value ="<?= $isi ?>" placeholder="Pilihan Jawaban" <?= $is_jawaban == 1 ? 'readonly' : '' ?>></p>
+                                    </div>
+                                    <div class="col-sm-2">
+                                        <p class="form-control-static"><input type="text" class="form-control" id="logicja" name="logicja[]" value ="<?= $logic ?>" placeholder="Logic" <?= $is_jawaban == 1 ? 'readonly' : '' ?>></p>
+                                    </div>
+                                    <?php if ($is_jawaban == 0): ?>
+                                    <div class="col-sm-3">
+                                        <button type="button" class="btn btn-danger btn-block" onclick="removeJawabanRow('<?= $rowId ?>')">
+                                            <i class="fa fa-trash"></i>
+                                        </button>
+                                    </div>   
+                                    <?php endif;?>                                                             
+                                </div>
+                                <?php 
+                                    $count = true; 
+                                    $index++;
+                                } ?>
+                                <div id="PilGandaCheckContainer<?= $lu->ps_id ?>"></div>
+                                <div style="text-align: center; margin-top: 1rem;">
+                                    <p><button type="button" class="btn btn-default btn-block" onclick="extraPilGandaCheckEdit('<?= $lu->ps_id ?>')" style="margin-top:6px;"><i class="fa fa-plus"></i> Tambahkan</button></p>
+                                </div>
+                            </div>
+                            <div id="div3<?= $lu->ps_id ?>" style="display:none;">
+                                <?php
+                                    $parts = explode(':', rtrim($lu->ps_pilihan_jawaban, ';'), 3);
+                                    $logic3 = $parts[1] ?? '';
+                                ?>
+                                <div id="InpTextContainer<?= $lu->ps_id ?>"></div>
+                                <div class="form-group row">
+                                    <div class="col-sm-9">
+                                        <select name="type_data<?= $lu->ps_id ?>" id="type_data<?= $lu->ps_id ?>" class="form-control" required>
+                                            <option value="text" <?= $lu->type_data == 'text' ? ' selected' : '' ?>>Text</option>
+                                            <option value="number" <?= $lu->type_data == 'number' ? ' selected' : '' ?>>Number</option>
+                                        </select>
+                                    </div>
+                                    <div class="col-sm-3">
+                                        <p class="form-control-static">
+                                            <input type="text" class="form-control" name="logic_3<?= $lu->ps_id ?>" value="<?= $logic3 ?>" placeholder="Logic">
+                                        </p>
+                                    </div>
+                                </div>
+                                <!-- <div class="col-sm-3">
+                                    <p><button type="button" class="btn btn-default btn-block" onclick="extraInpTextEdit('<?= $lu->ps_id ?>')" style="margin-top:6px;"><i class="fa fa-plus"></i> Tambahkan Logic</button></p>
+                                </div> -->
+                            </div>
+                            <div id="div4<?= $lu->ps_id ?>" style="display:none;">
+                                <?php
+                                    $parts = explode(':', rtrim($lu->ps_pilihan_jawaban, ';'), 3);
+                                    $logic4 = $parts[1] ?? '';
+                                ?>
+                                <div id="InpTextAreaContainer<?= $lu->ps_id ?>"></div>
+                                <div class="form-group row">
+                                    <div class="col-sm-3">
+                                        <p class="form-control-static">
+                                            <input type="text" class="form-control" name="logic_4<?= $lu->ps_id ?>" value="<?= $logic4 ?>" placeholder="Logic">
+                                        </p>
+                                    </div>
+                                </div>
+                                <!-- <div class="col-sm-3">
+                                    <p><button type="button" class="btn btn-default btn-block" onclick="extraInpTextAreaEdit('<?= $lu->ps_id ?>')" style="margin-top:6px;"><i class="fa fa-plus"></i> Tambahkan Logic</button></p>
+                                </div> -->
+                            </div>
+                            <div id="div5<?= $lu->ps_id ?>" style="display:none;">
+                                <div class="form-group row">
+                                    <label class="col-sm-2 control-label">Jawaban</label>
+                                    <?php
+                                    $piljas = explode(';', rtrim($lu->ps_pilihan_jawaban, ';'));
+                                    $hasil = '';
+                                    $logic = '';
+                                    $range = '';
+
+                                    foreach ($piljas as $key => $pj) {
+                                        if (trim($pj) === '') continue;
+
+                                        $parts = explode(':', $pj, 3);
+
+                                        if ($key === 0) {
+                                            $hasil = trim($parts[0] ?? '');
+                                            $logic = trim($parts[1] ?? '');
+                                        } elseif ($key === 1) {
+                                            $range = trim($parts[0] ?? '');
+                                        }
+                                    }                                                                  
+                                    ?>
+                                    <div class="form-group">
+                                        <select name="pilja[]" id="pilja" class="form-control" <?= $is_jawaban == 1 ? 'disabled' : '' ?>>
+                                            <option value="">Pilih Tipe Likert</option>
+                                            <option value="star" <?= ($hasil == 'star') ? 'selected' : '' ?>>Star</option>
+                                            <option value="love" <?= ($hasil == 'love') ? 'selected' : '' ?>>Love</option>
+                                            <option value="bar" <?= ($hasil == 'bar') ? 'selected' : '' ?>>Bar</option>
+                                            <option value="opini" <?= ($hasil == 'opini') ? 'selected' : '' ?>>Opini</option>
+                                            <option value="persegi" <?= ($hasil == 'persegi') ? 'selected' : '' ?>>Persegi Rating</option>
+                                        </select>
+                                    </div>
+                                    <?php if ($is_jawaban == 1): ?>
+                                    <input type="hidden" name="pilja[]" value="<?= $hasil ?>">
+                                    <?php endif; ?>
+                                    <div class="col-sm-4">
+                                        <p class="form-control-static"><input type="text" class="form-control" id="pilja" name="pilja[]" value ="<?= $range ?>" placeholder="Tulis Teks Range" <?= $is_jawaban == 1 ? 'readonly' : '' ?>></p>
+                                    </div>
+                                    <div class="col-sm-5">
+                                        <p class="form-control-static"><input type="text" class="form-control" id="logicja" name="logicja[]" value ="<?= $logic ?>" placeholder="Logic" <?= $is_jawaban == 1 ? 'readonly' : '' ?>></p>
+                                    </div>
+                                </div>
+                                <div id="PilLikertContainer<?= $lu->ps_id ?>"></div>
+                            </div>
+
+                        </div>
+                        <div class="box-footer">
+                        <input type="hidden" name="idPertanyaan" value="<?= $lu->ps_id ?>">
+                            <input type="hidden" name="idSurvey" value="<?= $infosurvey[0]->id_survey ?>">
+                            <input type="hidden" name="idSeksi" value="<?= $infosurvey[0]->id_seksi ?>">
+                            <input type="hidden" name="kodeSeksi" value="<?= $infosurvey[0]->ss_kode ?>">
+
+                            <button type="submit" class="btn btn-success">Kirim</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="modal fade" id="hapusSurvey<?= $lu->ps_id; ?>">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h6 class="modal-title"> Hapus Pertanyaan Survey</h6>
+                    <button aria-label="Close" class="close" data-bs-dismiss="modal" type="button"><span aria-hidden="true">×</span></button>
+                </div>
+                <div class="modal-body">
+                    <div class="box-body">
+                        <h4>Anda yakin akan menghapus Pertanyaan <?= $lu->ps_pertanyaan; ?>?</h4>
+
+                    </div>
+                    <div class="box-footer">
+                        <a href="<?= base_url('admin/hapus_pertanyaan/' . $lu->ps_id_seksi . '/' . $lu->ps_id); ?>" class="btn btn-danger">Ya</a> &nbsp;
+                        <button class="btn btn-default" data-bs-dismiss="modal">Tidak</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <?php } ?>
     <div class="row row-sm row-deck">
         <div class="col-xl-12">
             <div class="card mg-b-20">
@@ -238,296 +526,11 @@ function tipepertanyaan($idtipe)
                                         </td>
                                         <td>
                                             <!--<a href="<?= base_url() ?>admin/seksi_detail/<?= $lu->ps_id; ?>"><button class="btn btn-sm btn-success"><i class="fa fa-menu"></i> Detail Seksi</button></a> &nbsp;-->
-                                            <button class="btn btn-sm btn-warning" data-bs-toggle="modal" data-bs-target="#editSurvey<?= $lu->ps_id; ?>"><i class="fa fa-edit"></i> Edit</button> &nbsp;
-                                            <button class="btn btn-sm btn-success" data-bs-toggle="modal" data-bs-target="#duplikatSurvey<?= $lu->ps_id; ?>"><i class="fa fa-copy"></i> Duplikat</button>
-                                            <button class="btn btn-sm btn-danger" data-bs-toggle="modal" data-bs-target="#hapusSurvey<?= $lu->ps_id; ?>"><i class="fa fa-trash"></i> Hapus</button>
+                                            <button class="btn btn-sm btn-warning my-1" data-bs-toggle="modal" data-bs-target="#editSurvey<?= $lu->ps_id; ?>"><i class="fa fa-edit"></i> Edit</button> &nbsp;
+                                            <button class="btn btn-sm btn-success my-1" data-bs-toggle="modal" data-bs-target="#duplikatSurvey<?= $lu->ps_id; ?>"><i class="fa fa-copy"></i> Duplikat</button>
+                                            <button class="btn btn-sm btn-danger my-1" data-bs-toggle="modal" data-bs-target="#hapusSurvey<?= $lu->ps_id; ?>"><i class="fa fa-trash"></i> Hapus</button>
                                         </td>
                                     </tr>
-                                    <div class="modal fade" id="editSurvey<?= $lu->ps_id; ?>">
-                                        <div class="modal-dialog modal-lg">
-                                            <div class="modal-content">
-                                                <div class="modal-header">
-                                                    <h6 class="modal-title"> Edit Pertanyaan Survey</h6>
-                                                    <button aria-label="Close" class="close" data-bs-dismiss="modal" type="button"><span aria-hidden="true">×</span></button>
-                                                </div>
-                                                <div class="modal-body">
-                                                    <form id="formEdit<?=$lu->ps_id?>" action="<?= base_url(); ?>admin/edit_pertanyaan/<?=$lu->ps_id?>" method="POST">
-                                                        <div class="box-body">
-                                                            <div class="form-group">
-                                                                <label for="KodePertanyaan">Kode Pertanyaan :</label>
-                                                                <div class="input-group">
-                                                                    <div class="input-group-prepend">
-                                                                        <span class="input-group-text"><?= $infosurvey[0]->ss_kode ?></span>
-                                                                    </div>
-                                                                    <input type="text" name="KodePertanyaan<?= $lu->ps_id ?>" value="<?= str_replace($infosurvey[0]->ss_kode, '', $lu->ps_kode); ?>" class="form-control" placeholder="Isi kode akhir">
-                                                                </div>
-                                                            </div>
-                                                            <div class="form-group" style="align-items: center;">
-                                                                <label for="kewajibanMengisi">Kewajiban Mengisi :</label>              
-                                                                <select name="kewajibanMengisi<?= $lu->ps_id ?>" id="kewajibanMengisi<?= $lu->ps_id ?>" class="form-control">
-                                                                    <option value="" <?= $lu->must_answer == '' ? 'selected' : '' ?>>Tidak Wajib</option>    
-                                                                    <option value="required" <?= $lu->must_answer == 'required' ? 'selected' : '' ?>>Wajib Diisi</option>
-                                                                    <!-- <option value="required_if">Required dengan Logic</option> -->
-                                                                </select>
-                                                            </div>
-                                                            <div class="form-group">
-                                                                <label for="Pertanyaan">Pertanyaan :</label>
-                                                                <input type="hidden" name="Pertanyaan<?= $lu->ps_id ?>" id="pertanyaanHidden<?= $lu->ps_id ?>" value="<?= set_value('Pertanyaan') ?>">
-                                                                <div id="editor<?= $lu->ps_id ?>" style="min-height: 160px;"><?= $lu->ps_pertanyaan ?></div>
-                                                            </div>
-                                                            <div class="form-group">
-                                                                <label for="tipePertanyaan">Tipe Pertanyaan :</label>
-                                                                <select name="tipePertanyaan<?= $lu->ps_id ?>" id="tipePertanyaan<?= $lu->ps_id ?>" onchange="showDivEdit('div', this, '<?= $lu->ps_id ?>')" class="form-control" <?= $is_jawaban == 1 ? 'disabled' : '' ?> required>
-                                                                    <option value="1"<?= $lu->ps_tipe_pertanyaan == '1' ? 'selected' : '' ?>>Pilihan Ganda - Radio</option>
-                                                                    <option value="2"<?= $lu->ps_tipe_pertanyaan == '2' ? 'selected' : '' ?>>Pilihan Ganda - Checkbox</option>
-                                                                    <option value="3"<?= $lu->ps_tipe_pertanyaan == '3' ? 'selected' : '' ?>>Jawaban Singkat</option>
-                                                                    <option value="4"<?= $lu->ps_tipe_pertanyaan == '4' ? 'selected' : '' ?>>Jawaban Panjang</option>
-                                                                    <option value="5"<?= $lu->ps_tipe_pertanyaan == '5' ? 'selected' : '' ?>>Skala Likert</option>
-                                                                </select>
-                                                                <?php if ($is_jawaban == 1): ?>
-                                                                <input type="hidden" name="tipePertanyaan<?= $lu->ps_id ?>" value="<?= $lu->ps_tipe_pertanyaan ?>">
-                                                                <?php endif; ?>
-                                                            </div>
-                                                            <div id="div1<?= $lu->ps_id ?>" style="display:none;">
-                                                                <?php
-                                                                $piljas = explode(';', rtrim($lu->ps_pilihan_jawaban, ';'));
-                                                                $count = false;
-                                                                $index = 0;
-                                                                foreach ($piljas as $pj) {
-                                                                    $parts = explode(':', $pj);
-                                                                    $isi   = $parts[0] ?? '';
-                                                                    $logic = $parts[1] ?? '';
-                                                                    $type  = $parts[2] ?? 'default';
-                                                                    $rowId = "jawabanRadioRow{$lu->ps_id}_$index";
-                                                                ?>
-                                                                <div class="form-group row" id="<?= $rowId ?>">
-                                                                    <?php if ($count == false) { ?>
-                                                                        <label class="col-sm-2 control-label">Jawaban</label>
-                                                                    <?php } else { ?>
-                                                                        <label class="col-sm-2 control-label">&nbsp;</label>
-                                                                    <?php } ?>
-                                                                    <?php if ($is_jawaban == 1): ?>
-                                                                    <div class="col-sm-2">
-                                                                        <p class="form-control-static">
-                                                                        <input type="text" class="form-control" name="typeja[]" value="<?= $type ?>" readonly>
-                                                                        </p>
-                                                                    </div>
-                                                                    <?php else: ?>
-                                                                    <div class="col-sm-2">
-                                                                        <p class="form-control-static">
-                                                                            <select name="typeja[]" class="form-control">
-                                                                                <option value="default"<?= $type == 'default' ? ' selected' : '' ?>>Default</option>
-                                                                                <option value="essai"<?= $type == 'essai' ? ' selected' : '' ?>>Essai</option>
-                                                                            </select>
-                                                                        </p>
-                                                                    </div>
-                                                                    <?php endif; ?>
-                                                                    <div class="col-sm-3">
-                                                                        <p class="form-control-static">
-                                                                            <input type="text" class="form-control" name="pilja[]" value="<?= $isi ?>" placeholder="Pilihan Jawaban" <?= $is_jawaban == 1 ? 'readonly' : '' ?>>
-                                                                        </p>
-                                                                    </div>
-                                                                    <div class="col-sm-2">
-                                                                        <p class="form-control-static">
-                                                                            <input type="text" class="form-control" name="logicja[]" value="<?= $logic ?>" placeholder="Logic" <?= $is_jawaban == 1 ? 'readonly' : '' ?>>
-                                                                        </p>
-                                                                    </div>
-                                                                    <?php if ($is_jawaban == 0): ?>
-                                                                    <div class="col-sm-3">
-                                                                        <button type="button" class="btn btn-danger btn-block" onclick="removeJawabanRow('<?= $rowId ?>')">
-                                                                            <i class="fa fa-trash"></i>
-                                                                        </button>
-                                                                    </div>
-                                                                    <?php endif; ?>
-                                                                </div>
-                                                                <?php 
-                                                                    $count = true; 
-                                                                    $index++;
-                                                                } ?>
-                                                                <div id="PilGandaRadioContainer<?= $lu->ps_id ?>"></div>
-                                                                <!-- <div style="text-align: center; margin-top: 1rem;">
-                                                                    <button type="button" class="btn btn-default btn-block" onclick="extraPilGandaRadioEdit('<?= $lu->ps_id ?>')">
-                                                                        <i class="fa fa-plus"></i> Tambahkan
-                                                                    </button>
-                                                                </div> -->
-                                                            </div>
-                                                            <div id="div2<?= $lu->ps_id ?>" style="display:none;">
-                                                                <?php
-                                                                $piljas = explode(';', rtrim($lu->ps_pilihan_jawaban, ';'));
-                                                                $count = false;
-                                                                $index = 0;
-                                                                foreach ($piljas as $pj) {
-                                                                    $parts = explode(':', $pj);
-
-                                                                    $isi   = $parts[0] ?? '';
-                                                                    $logic = $parts[1] ?? '';
-                                                                    $type  = $parts[2] ?? 'default'; ;
-                                                                    $rowId = "jawabanCheckRow{$lu->ps_id}_$index";
-                                                                ?>
-                                                                <div class="form-group row" id="<?= $rowId ?>">
-                                                                <?php if($count == false) { ?>
-                                                                    <label class="col-sm-2 control-label">Jawaban</label>
-                                                                    <?php } else {?>
-                                                                        <label class="col-sm-2 control-label">&nbsp</label>
-                                                                    <?php } ?>
-                                                                    <?php if ($is_jawaban == 1): ?>
-                                                                    <div class="col-sm-2">
-                                                                        <p class="form-control-static">
-                                                                        <input type="text" class="form-control" name="typeja[]" value="<?= $type ?>" readonly>
-                                                                        </p>
-                                                                    </div>
-                                                                    <?php else: ?>
-                                                                    <div class="col-sm-2">
-                                                                        <p class="form-control-static">
-                                                                            <select name="typeja[]" class="form-control">
-                                                                                <option value="default"<?= $type == 'default' ? ' selected' : '' ?>>Default</option>
-                                                                                <option value="essai"<?= $type == 'essai' ? ' selected' : '' ?>>Essai</option>
-                                                                            </select>
-                                                                        </p>
-                                                                    </div>
-                                                                    <?php endif; ?>
-                                                                    <div class="col-sm-3">
-                                                                        <p class="form-control-static"><input type="text" class="form-control" id="pilja" name="pilja[]" value ="<?= $isi ?>" placeholder="Pilihan Jawaban" <?= $is_jawaban == 1 ? 'readonly' : '' ?>></p>
-                                                                    </div>
-                                                                    <div class="col-sm-2">
-                                                                        <p class="form-control-static"><input type="text" class="form-control" id="logicja" name="logicja[]" value ="<?= $logic ?>" placeholder="Logic" <?= $is_jawaban == 1 ? 'readonly' : '' ?>></p>
-                                                                    </div>
-                                                                    <?php if ($is_jawaban == 0): ?>
-                                                                    <div class="col-sm-3">
-                                                                        <button type="button" class="btn btn-danger btn-block" onclick="removeJawabanRow('<?= $rowId ?>')">
-                                                                            <i class="fa fa-trash"></i>
-                                                                        </button>
-                                                                    </div>   
-                                                                    <?php endif;?>                                                             
-                                                                </div>
-                                                                <?php 
-                                                                    $count = true; 
-                                                                    $index++;
-                                                                } ?>
-                                                                <div id="PilGandaCheckContainer<?= $lu->ps_id ?>"></div>
-                                                                <!-- <div style="text-align: center; margin-top: 1rem;">
-                                                                    <p><button type="button" class="btn btn-default btn-block" onclick="extraPilGandaCheckEdit('<?= $lu->ps_id ?>')" style="margin-top:6px;"><i class="fa fa-plus"></i> Tambahkan</button></p>
-                                                                </div> -->
-                                                            </div>
-                                                            <div id="div3<?= $lu->ps_id ?>" style="display:none;">
-                                                                <?php
-                                                        			$parts = explode(':', rtrim($lu->ps_pilihan_jawaban, ';'), 3);
-                                                                    $logic3 = $parts[1] ?? '';
-                                                                ?>
-                                                                <div id="InpTextContainer<?= $lu->ps_id ?>"></div>
-                                                                <div class="form-group row">
-                                                                    <div class="col-sm-9">
-                                                                        <select name="type_data<?= $lu->ps_id ?>" id="type_data<?= $lu->ps_id ?>" class="form-control" required>
-                                                                            <option value="text" <?= $lu->type_data == 'text' ? ' selected' : '' ?>>Text</option>
-                                                                            <option value="number" <?= $lu->type_data == 'number' ? ' selected' : '' ?>>Number</option>
-                                                                        </select>
-                                                                    </div>
-                                                                    <div class="col-sm-3">
-                                                                        <p class="form-control-static">
-                                                                            <input type="text" class="form-control" name="logic_3<?= $lu->ps_id ?>" value="<?= $logic3 ?>" placeholder="Logic">
-                                                                        </p>
-                                                                    </div>
-                                                                </div>
-                                                                <!-- <div class="col-sm-3">
-                                                                    <p><button type="button" class="btn btn-default btn-block" onclick="extraInpTextEdit('<?= $lu->ps_id ?>')" style="margin-top:6px;"><i class="fa fa-plus"></i> Tambahkan Logic</button></p>
-                                                                </div> -->
-                                                            </div>
-                                                            <div id="div4<?= $lu->ps_id ?>" style="display:none;">
-                                                                <?php
-                                                        			$parts = explode(':', rtrim($lu->ps_pilihan_jawaban, ';'), 3);
-                                                                    $logic4 = $parts[1] ?? '';
-                                                                ?>
-                                                                <div id="InpTextAreaContainer<?= $lu->ps_id ?>"></div>
-                                                                <div class="form-group row">
-                                                                    <div class="col-sm-3">
-                                                                        <p class="form-control-static">
-                                                                            <input type="text" class="form-control" name="logic_4<?= $lu->ps_id ?>" value="<?= $logic4 ?>" placeholder="Logic">
-                                                                        </p>
-                                                                    </div>
-                                                                </div>
-                                                                <!-- <div class="col-sm-3">
-                                                                    <p><button type="button" class="btn btn-default btn-block" onclick="extraInpTextAreaEdit('<?= $lu->ps_id ?>')" style="margin-top:6px;"><i class="fa fa-plus"></i> Tambahkan Logic</button></p>
-                                                                </div> -->
-                                                            </div>
-                                                            <div id="div5<?= $lu->ps_id ?>" style="display:none;">
-                                                                <div class="form-group row">
-                                                                    <label class="col-sm-2 control-label">Jawaban</label>
-                                                                    <?php
-                                                                    $piljas = explode(';', rtrim($lu->ps_pilihan_jawaban, ';'));
-                                                                    $hasil = '';
-                                                                    $logic = '';
-                                                                    $range = '';
-
-                                                                    foreach ($piljas as $key => $pj) {
-                                                                        if (trim($pj) === '') continue;
-
-                                                                        $parts = explode(':', $pj, 3);
-
-                                                                        if ($key === 0) {
-                                                                            $hasil = trim($parts[0] ?? '');
-                                                                            $logic = trim($parts[1] ?? '');
-                                                                        } elseif ($key === 1) {
-                                                                            $range = trim($parts[0] ?? '');
-                                                                        }
-                                                                    }                                                                  
-                                                                    ?>
-                                                                    <div class="form-group">
-                                                                        <select name="pilja[]" id="pilja" class="form-control" <?= $is_jawaban == 1 ? 'disabled' : '' ?>>
-                                                                            <option value="">Pilih Tipe Likert</option>
-                                                                            <option value="star" <?= ($hasil == 'star') ? 'selected' : '' ?>>Star</option>
-                                                                            <option value="love" <?= ($hasil == 'love') ? 'selected' : '' ?>>Love</option>
-                                                                            <option value="bar" <?= ($hasil == 'bar') ? 'selected' : '' ?>>Bar</option>
-                                                                            <option value="opini" <?= ($hasil == 'opini') ? 'selected' : '' ?>>Opini</option>
-                                                                            <option value="persegi" <?= ($hasil == 'persegi') ? 'selected' : '' ?>>Persegi Rating</option>
-                                                                        </select>
-                                                                    </div>
-                                                                    <?php if ($is_jawaban == 1): ?>
-                                                                    <input type="hidden" name="pilja[]" value="<?= $hasil ?>">
-                                                                    <?php endif; ?>
-                                                                    <div class="col-sm-4">
-                                                                        <p class="form-control-static"><input type="text" class="form-control" id="pilja" name="pilja[]" value ="<?= $range ?>" placeholder="Tulis Teks Range" <?= $is_jawaban == 1 ? 'readonly' : '' ?>></p>
-                                                                    </div>
-                                                                    <div class="col-sm-5">
-                                                                        <p class="form-control-static"><input type="text" class="form-control" id="logicja" name="logicja[]" value ="<?= $logic ?>" placeholder="Logic" <?= $is_jawaban == 1 ? 'readonly' : '' ?>></p>
-                                                                    </div>
-                                                                </div>
-                                                                <div id="PilLikertContainer<?= $lu->ps_id ?>"></div>
-                                                            </div>
-
-                                                        </div>
-                                                        <div class="box-footer">
-                                                        <input type="hidden" name="idPertanyaan" value="<?= $lu->ps_id ?>">
-                                                            <input type="hidden" name="idSurvey" value="<?= $infosurvey[0]->id_survey ?>">
-                                                            <input type="hidden" name="idSeksi" value="<?= $infosurvey[0]->id_seksi ?>">
-                                                            <input type="hidden" name="kodeSeksi" value="<?= $infosurvey[0]->ss_kode ?>">
-
-                                                            <button type="submit" class="btn btn-success">Kirim</button>
-                                                        </div>
-                                                    </form>
-                                                </div>
-                                            </div>
-                                        </div>
-                                    </div>
-                                    <div class="modal fade" id="hapusSurvey<?= $lu->ps_id; ?>">
-                                        <div class="modal-dialog">
-                                            <div class="modal-content">
-                                                <div class="modal-header">
-                                                    <h6 class="modal-title"> Hapus Pertanyaan Survey</h6>
-                                                    <button aria-label="Close" class="close" data-bs-dismiss="modal" type="button"><span aria-hidden="true">×</span></button>
-                                                </div>
-                                                <div class="modal-body">
-                                                    <div class="box-body">
-                                                        <h4>Anda yakin akan menghapus Pertanyaan <?= $lu->ps_pertanyaan; ?>?</h4>
-
-                                                    </div>
-                                                    <div class="box-footer">
-                                                        <a href="<?= base_url('admin/hapus_pertanyaan/' . $lu->ps_id_seksi . '/' . $lu->ps_id); ?>" class="btn btn-danger">Ya</a> &nbsp;
-                                                        <button class="btn btn-default" data-bs-dismiss="modal">Tidak</button>
-                                                    </div>
-                                                </div>
-                                            </div>
-                                        </div>
-                                    </div>
                                     
                                     <!-- <div class="modal fade" id="duplikatSurvey<?= $lu->ps_id; ?>"> -->
                                     <div class="modal fade" id="duplikatSurvey<?= $lu->ps_id; ?>">
@@ -853,7 +856,7 @@ function tipepertanyaan($idtipe)
                 <label class="col-sm-2 control-label">&nbsp;</label>
                 <div class="col-sm-2">
                     <p class="form-control-static">
-                        <select name="typeja_new[]" class="form-control" required>
+                        <select name="typeja[]" class="form-control" required>
                             <option value="default">Default</option>
                             <option value="essai">Essai</option>
                         </select>
@@ -861,12 +864,12 @@ function tipepertanyaan($idtipe)
                 </div>
                 <div class="col-sm-3">
                     <p class="form-control-static">
-                        <input type="text" class="form-control" name="pilja_new[]" placeholder="Pilihan Jawaban">
+                        <input type="text" class="form-control" name="pilja[]" placeholder="Pilihan Jawaban">
                     </p>
                 </div>
                 <div class="col-sm-2">
                     <p class="form-control-static">
-                        <input type="text" class="form-control" name="logicja_new[]" placeholder="Logic">
+                        <input type="text" class="form-control" name="logicja[]" placeholder="Logic">
                     </p>
                 </div>
                 <div class="col-sm-3">

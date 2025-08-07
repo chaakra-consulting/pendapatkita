@@ -407,7 +407,7 @@ class Admin extends CI_Controller
 			$data['id'] = $id;
 			$data['listsurvey'] = $this->m_admin->list_survey($id)->result();
 			$data['listseksi'] = $this->db->query("SELECT * FROM seksi_survey WHERE ss_id_survey='$id' AND ss_status='0' ORDER BY id_seksi ASC")->result();
-
+			
 			if ($this->session->status == 'koordinator') {
 				//$data['hasilsurvey'] = $this->m_admin->data_survey_byid($id)->result();
 				//$this->load->view('hasil',$data);
@@ -493,6 +493,100 @@ class Admin extends CI_Controller
 
 				$this->load->view('hasil', $data);
 			}
+		}
+	}
+
+	public function hasil_pool_data($id_pool_data = FALSE)
+	{
+		$data['title'] = 'Data Survey';
+		
+		if ($id_pool_data == TRUE) {
+			$data['id'] = $id_pool_data;
+
+			$data['listpooldata'] = $this->m_admin->list_pool_data_by_id($id_pool_data)->result();
+
+			$id_surveys = $this->m_admin->list_id_survey_by_pool_data($id_pool_data)->result();
+
+			$data['listpooldetail'] = $this->m_admin->list_pool_data_detail($id_pool_data)->result();
+
+			$data['hasilsurvey'] = $this->m_admin->data_survey_byids($id_surveys)->result();
+
+			foreach($data['listpooldetail'] as $index => $pool_detail){
+				$id_pool_data_detail = $pool_detail->id_pool_data_detail;
+				$pertanyaans = $this->m_admin->get_pertanyaan_by_pool_detail($id_pool_data_detail);
+			
+				$arrPertanyaans = [];
+				$seen = [];
+				$detailColspan = 0;
+				$options_all = [];
+			
+				foreach ($pertanyaans as $p) {
+					if (in_array($p->ps_id, $seen)) {
+						continue;
+					}
+					$seen[] = $p->ps_id;
+					
+					$arrPertanyaans[] = [
+						'id_pool_data_pertanyaan' => $p->id_pool_data_pertanyaan,
+						'ps_id'                   => $p->ps_id,
+						'kode'                    => $p->ps_kode,
+						'is_checkbox'             => $p->ps_tipe_pertanyaan == '2',
+						'survey_id'               => $p->ps_id_survey,
+						'seksi_id'                => $p->ps_id_seksi,
+						'judul_seksi'             => $p->ss_judul,
+						'pilihan_jawaban'         => $p->ps_pilihan_jawaban,
+						'colspan'                 => 1,
+						'options'                 => [],
+						'essay_option'            => null,
+					];
+			
+					$lastIndex = count($arrPertanyaans) - 1;
+			
+					if (!empty($p->ps_pilihan_jawaban)) {
+						$options_list = [];
+						$pilihan = explode(';', rtrim($p->ps_pilihan_jawaban, ';'));
+
+						foreach ($pilihan as $pil) {
+							if (!empty($pil)) {
+								$parts = explode(':', $pil);
+								if ($p->ps_tipe_pertanyaan == 2) {
+									$option_text = $parts[0];
+									$options_list[] = $option_text;
+				
+									if (isset($parts[2]) && $parts[2] == 'essai') {
+										$arrPertanyaans[$lastIndex]['essay_option'] = $option_text;
+									}
+								}
+							}
+						}
+			
+						if ($p->ps_tipe_pertanyaan == 2) {
+							$detailColspan += (count($options_list) > 0 ? count($options_list) : 1);
+							$arrPertanyaans[$lastIndex]['options'] = $options_list;
+							$arrPertanyaans[$lastIndex]['colspan'] = count($options_list) > 0 ? count($options_list) : 1;
+						}			
+						
+						$options_all = array_unique(array_merge($options_all, $options_list));
+					}
+				}
+
+				if ($detailColspan > 1) {
+					array_push($options_all, "Lainnya");
+				}
+
+				$options_result = array_values(array_unique($options_all));
+			
+				$data['listpooldetail'][$index]->colspan = $detailColspan > 0 ? $detailColspan : 1;
+				$data['listpooldetail'][$index]->options_all = $options_result;
+				$data['listpooldetail'][$index]->pertanyaans = array_map(fn($item) => (object)$item, $arrPertanyaans);
+			}
+			
+			// echo '<pre>';
+			// print_r($data['hasilsurvey']);
+			// echo '</pre>';
+			// exit;
+			
+			$this->load->view('hasil_pool_data', $data);
 		}
 	}
 
@@ -757,22 +851,48 @@ class Admin extends CI_Controller
 		$pilja = $this->input->post('pilja');
 		$logicja = $this->input->post('logicja');
 		$typeja = $this->input->post('typeja');
+
 		$dataJawaban = '';
-		if(is_array($pilja)) {
-			$pilja = $this->input->post('pilja');
-			$pilja = array_filter($pilja);
-			$pilja = array_unique($pilja);
-			$pilja = array_values($pilja); 
+
+		// Ambil pilihan lama dalam bentuk array
+		$old_pilihan = [];
+		if (!empty($old_data->ps_pilihan_jawaban)) {
+			$old_parts = explode(';', rtrim($old_data->ps_pilihan_jawaban, ';'));
+			foreach ($old_parts as $part) {
+				$exp = explode(':', $part);
+				if (!empty($exp[0])) {
+					$old_pilihan[$exp[0]] = [
+						'logic' => $exp[1] ?? '',
+						'type'  => $exp[2] ?? '',
+					];
+				}
+			}
+		}
+
+		// Bersihkan data baru dari form
+		if (is_array($pilja)) {
+			$pilja   = array_filter(array_map('trim', $pilja));
+			$pilja   = array_unique($pilja);
+			$pilja   = array_values($pilja);
 
 			foreach ($pilja as $key => $v) {
-				if (count($pilja) > 1) {
-					if ($v != '') {
-						$dataJawaban .= $v . ':' . $logicja[$key] . ':' . $typeja[$key] . ';';
+				if ($v !== '') {
+					// Jika ada di pilihan lama → pakai logic & type lama
+					if (isset($old_pilihan[$v])) {
+						$logic = $logicja[$key] ?? $old_pilihan[$v]['logic'];
+						$type  = $typeja[$key] ?? $old_pilihan[$v]['type'];
+					} else {
+						// Jika jawaban baru -> pakai input sekarang (atau default)
+						$logic = $logicja[$key] ?? '';
+						$type  = $typeja[$key] ?? 'default';
 					}
-				} 
+
+					$dataJawaban .= $v . ':' . $logic . ':' . $type . ';';
+				}
 			}
-		}else {
-			if($tipe == 3 || $tipe == 4) {
+		} else {
+			// jika bukan multiple choice (misalnya essai)
+			if ($tipe == 3 || $tipe == 4) {
 				$logic_new = $this->input->post('logic_'.$tipe.$id);
 				$cleaned = explode(';', $old_data->ps_pilihan_jawaban)[0];
 				$parts = explode(':', $cleaned, 3);
@@ -781,8 +901,7 @@ class Admin extends CI_Controller
 				$logic = $logic_new ?? $parts[1];
 				$type  = '';
 				$dataJawaban = $isi . ':' . $logic . ':' . $type . ';';
-
-			}else{
+			} else {
 				$dataJawaban = $old_data->ps_pilihan_jawaban;
 			}
 		}
@@ -1042,5 +1161,200 @@ function hapus_survey($id){
 				'message' => 'Gagal menghapus data.'
 			]);
 		}
+	}
+	// POOL DATA
+	public function pool_data()
+	{
+		$data['title'] = 'Pool Data';
+		$data['listpooldata'] = $this->m_admin->list_pool_data()->result();
+		// print_r($data);exit;
+		$this->header($data);
+		$this->load->view('pool_data');
+		$this->load->view('template/footer');
+	}
+
+	function tambah_pool_data()
+	{
+		$namaData = $this->input->post('NamaData');
+		$keterangan = $this->input->post('Keterangan');
+
+		$data = [
+			'pd_nama_kategori' => $namaData,
+			'pd_keterangan' => $keterangan,
+		];
+		// print_r($data);exit;
+		$this->m_admin->t_survey("pool_data", $data);
+		$this->session->set_flashdata('t_survey', '');
+
+		redirect('admin/pool_data');
+	}
+
+	function edit_pool_data($id)
+	{
+		$namaData = $this->input->post('NamaData');
+		$keterangan = $this->input->post('Keterangan');
+		$where = ['id_pool_data' => $id];
+
+		$data = [
+			'pd_nama_kategori' => $namaData,
+			'pd_keterangan' => $keterangan,
+		];
+		// print_r($id);exit;
+		$this->m_admin->e_survey($where, 'pool_data', $data);
+		$this->session->set_flashdata('e_survey', '');
+
+		redirect('admin/pool_data');
+	}
+
+	function hapus_pool_data($id)
+	{
+		$where = ['id_pool_data' => $id];
+		$data = [
+			'is_deleted' => 1,
+		];
+
+		$this->m_admin->e_survey($where, 'pool_data', $data);
+
+		redirect($this->agent->referrer());
+	}
+
+	public function pool_data_detail($id_pool_data)
+	{
+		$data['title'] = 'Pool Data Detail';
+		$data['pooldata'] = $this->m_admin->list_pool_data_by_id($id_pool_data)->row();
+
+		$list = $this->m_admin->list_pool_data_detail($id_pool_data)->result();
+		foreach ($list as &$row) {
+			$row->pertanyaan = $this->m_admin->get_pertanyaan_by_pool_detail($row->id_pool_data_detail);
+		}
+		$data['listpooldatadetail'] = $list;
+		// echo '<pre>' . print_r($data['listpooldatadetail'], true) . '</pre>';
+		// exit;
+		$data['listsurvey'] = $this->m_admin->list_survey()->result();
+
+		$this->header($data);
+		$this->load->view('pool_data_detail');
+		$this->load->view('template/footer');
+	}
+
+	function tambah_pool_data_detail()
+	{
+		$kode = $this->input->post('Kode');
+		$namaPernyataan = $this->input->post('NamaPernyataan');
+		$id_survey = $this->input->post('id_survey');
+		$id_seksi = $this->input->post('id_seksi');
+		$id_pertanyaan = $this->input->post('id_pertanyaan');
+		$id_pool_data = $this->input->post('id_pool_data');
+
+		$data = [
+			'pdd_id_pool_data' => $id_pool_data,
+			'pdd_kode' => $kode,
+			'pdd_nama_pertanyaan' => $namaPernyataan,
+		];
+		
+		$id_pool_data_detail = $this->m_admin->t_survey("pool_data_detail", $data);
+
+		foreach($id_pertanyaan as $index => $pertanyaan) {
+			$dataDetailPertanyaan = [
+				'pddp_id_pool_data' => $id_pool_data,
+				'pddp_id_pool_data_detail' => $id_pool_data_detail,
+				'pddp_id_survey' => $id_survey[$index],	
+				'pddp_id_pertanyaan' => $pertanyaan,
+			];
+			$this->m_admin->t_survey("pool_data_detail_pertanyaan", $dataDetailPertanyaan);
+		}
+
+		$this->session->set_flashdata('t_survey', '');
+
+		redirect('admin/pool_data_detail/'.$id_pool_data);
+	}
+
+	function edit_pool_data_detail($id)
+	{
+		$kode = $this->input->post('Kode');
+		$namaPernyataan = $this->input->post('NamaPernyataan');
+		$id_pool_data_pertanyaan = $this->input->post('id_pool_data_pertanyaan');
+		$id_survey = $this->input->post('id_survey_edit');
+		$id_seksi = $this->input->post('id_seksi_edit');
+		$id_pertanyaan = $this->input->post('id_pertanyaan_edit');
+		$id_pool_data = $this->input->post('id_pool_data');
+
+		$pertanyaans = $this->m_admin->get_pertanyaan_by_pool_detail($id);
+		$idPoolDataPertanyaanOld = array_column($pertanyaans, 'id_pool_data_pertanyaan');
+		if($idPoolDataPertanyaanOld){
+			$removeIds = array_diff($idPoolDataPertanyaanOld, $id_pool_data_pertanyaan);
+			foreach($removeIds as $removeId) {
+				$where = ['id_pool_data_pertanyaan' => $removeId];
+				$this->m_admin->del_survey($where, 'pool_data_detail_pertanyaan');
+			}
+		}
+
+		$where = ['id_pool_data_detail' => $id];
+		$data = [
+			'pdd_id_pool_data' => $id_pool_data,
+			'pdd_kode' => $kode,
+			'pdd_nama_pertanyaan' => $namaPernyataan,
+		];
+
+		$this->m_admin->e_survey($where, 'pool_data_detail', $data);
+
+		foreach($id_pertanyaan as $index => $pertanyaan) {
+			if(isset($id_pool_data_pertanyaan[$index]) && $id_pool_data_pertanyaan[$index]){
+				$where = ['id_pool_data_pertanyaan' => $id_pool_data_pertanyaan[$index]];
+				$data = [
+					'pddp_id_survey' => $id_survey[$index],	
+					'pddp_id_pertanyaan' => $pertanyaan,
+				];
+		
+				$this->m_admin->e_survey($where, 'pool_data_detail_pertanyaan', $data);
+			}else{
+				$dataDetailPertanyaan = [
+					'pddp_id_pool_data' => $id_pool_data,
+					'pddp_id_pool_data_detail' => $id,
+					'pddp_id_survey' => $id_survey[$index],	
+					'pddp_id_pertanyaan' => $pertanyaan,
+				];
+				$this->m_admin->t_survey("pool_data_detail_pertanyaan", $dataDetailPertanyaan);
+			}
+		}
+
+		$this->session->set_flashdata('t_survey', '');
+		// print_r($_POST);
+		// print_r($this->input->post());
+		// exit;
+		redirect('admin/pool_data_detail/'.$id_pool_data);
+	}
+	
+	
+	function hapus_pool_data_detail($id)
+	{
+		$where = ['id_pool_data_detail' => $id];
+		$data = [
+			'is_deleted' => 1,
+		];
+
+		$this->m_admin->e_survey($where, 'pool_data_detail', $data);
+
+		redirect($this->agent->referrer());
+	}
+
+	public function get_seksi_by_id_survey()
+	{
+		$survey_id = $this->input->get('survey_id'); 
+		$listseksi = $this->m_admin->list_seksi_by_idsurvey($survey_id)->result();
+	
+		header('Content-Type: application/json');
+		echo json_encode($listseksi);
+		exit;
+	}
+
+	public function get_pernyataan_by_id_seksi()
+	{
+		$seksi_id = $this->input->get('seksi_id');
+		$listpernyataan = $this->m_admin->list_pertanyaan_by_seksi($seksi_id)->result();
+
+		header('Content-Type: application/json');
+		echo json_encode($listpernyataan);
+		exit;
 	}
 }

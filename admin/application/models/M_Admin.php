@@ -160,6 +160,36 @@ class M_Admin extends CI_Model
 
         return $this->db->query($query, array($id, $id));
     }
+
+    public function pertanyaan_survey_by_id($id)
+    {
+        //return $this->db->get_where($mapel, $id_surveyor);
+        // return $this->db->query('SELECT * FROM pertanyaan_survey WHERE ps_id_survey=' . $id . ' AND ps_status=0 ORDER BY ps_id_seksi ASC');
+        $query = "
+            SELECT * FROM pertanyaan_survey 
+            WHERE ps_id_survey = ? AND ps_status = 0 
+            ORDER BY 
+                ps_id_seksi ASC,
+                CASE 
+                    WHEN ps_kode IS NULL OR ps_kode = '' THEN ps_create
+                    ELSE (
+                        SELECT MIN(ps_create) 
+                        FROM pertanyaan_survey sub 
+                        WHERE sub.ps_id_survey = ? 
+                        AND sub.ps_status = 0 
+                        AND sub.ps_kode = pertanyaan_survey.ps_kode
+                        LIMIT 1
+                    )
+                END ASC,
+                CASE 
+                    WHEN ps_kode IS NULL OR ps_kode = '' THEN 1 
+                    ELSE 0 
+                END ASC,
+                ps_kode ASC
+        ";
+
+        return $this->db->query($query, array($id, $id));
+    }
     public function hitung_survey_byid($id)
     {
         //return $this->db->get_where($mapel, $id_surveyor);
@@ -170,6 +200,25 @@ class M_Admin extends CI_Model
         //return $this->db->get_where($mapel, $id_surveyor);
         return $this->db->query("SELECT * FROM jawaban_survey WHERE js_survey_id='" . $id . "' AND js_valid='1'");
     }
+
+    public function data_survey_byids($ids = [])
+    {
+        if (!empty($ids) && is_object($ids[0])) {
+            $ids = array_column(json_decode(json_encode($ids), true), 'pddp_id_survey');
+        }
+    
+        $this->db->select('jawaban_survey.*, survey.nama_survey');
+        $this->db->from('jawaban_survey');
+        $this->db->join('survey', 'survey.id_survey = jawaban_survey.js_survey_id', 'left');
+        $this->db->where('jawaban_survey.js_valid', '1');
+    
+        if (!empty($ids)) {
+            $this->db->where_in('jawaban_survey.js_survey_id', $ids);
+        }
+    
+        return $this->db->get();
+    }
+    
 
     public function count_data_survey_byid($id)
     {
@@ -326,6 +375,14 @@ class M_Admin extends CI_Model
         $this->db->where($where);
         $this->db->update($table, $data);
     }
+
+    function del_survey($where, $table)
+    {
+        $this->db->where($where);
+        $this->db->delete($table);
+        return $this->db->affected_rows() > 0;
+    }
+
     function delete_single_survey_data($id)
     {
         $this->db->where('js_id', $id);
@@ -376,4 +433,30 @@ class M_Admin extends CI_Model
 
         return $this->db->get();
     }
+
+    function list_id_survey_by_pool_data($id_pool_data = null)
+    {        
+        $this->db->select('pddp_id_survey');
+        $this->db->from('pool_data_detail_pertanyaan');
+    
+        if ($id_pool_data) {
+            $this->db->where('pddp_id_pool_data', $id_pool_data);
+        }
+    
+        $this->db->group_by('pddp_id_survey');
+    
+        return $this->db->get();
+    }
+
+    public function get_pertanyaan_by_pool_detail($id_pool_data_detail)
+    {
+        return $this->db->select('pddp.id_pool_data_pertanyaan,ps.ps_id, ps.ps_id_survey, ps.ps_id_seksi, ss.ss_kode, ss.ss_judul, ps.ps_kode, ps.ps_pertanyaan, ps.ps_pilihan_jawaban, ps.ps_tipe_pertanyaan')
+            ->from('pool_data_detail_pertanyaan pddp')
+            ->join('pertanyaan_survey ps', 'ps.ps_id = pddp.pddp_id_pertanyaan')
+            ->join('seksi_survey ss', 'ss.id_seksi = ps.ps_id_seksi')
+            ->where('pddp.pddp_id_pool_data_detail', $id_pool_data_detail)
+            ->get()
+            ->result();
+    }
+
 }
