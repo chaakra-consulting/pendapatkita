@@ -133,33 +133,37 @@ class M_Admin extends CI_Model
 
     public function pertanyaan_survey($id)
     {
-        //return $this->db->get_where($mapel, $id_surveyor);
-        // return $this->db->query('SELECT * FROM pertanyaan_survey WHERE ps_id_survey=' . $id . ' AND ps_status=0 ORDER BY ps_id_seksi ASC');
         $query = "
-            SELECT * FROM pertanyaan_survey 
-            WHERE ps_id_survey = ? AND ps_status = 0 
+            SELECT ps.* 
+            FROM pertanyaan_survey ps
+            JOIN seksi_survey ss 
+                ON ps.ps_id_seksi = ss.id_seksi
+            WHERE
+                ps.ps_id_survey = ? 
+                AND ps.ps_status = 0
+                AND ss.ss_status = 0
             ORDER BY 
-                ps_id_seksi ASC,
+                ps.ps_id_seksi ASC,
                 CASE 
-                    WHEN ps_kode IS NULL OR ps_kode = '' THEN ps_create
+                    WHEN ps.ps_kode IS NULL OR ps.ps_kode = '' THEN ps.ps_create
                     ELSE (
-                        SELECT MIN(ps_create) 
+                        SELECT MIN(sub.ps_create) 
                         FROM pertanyaan_survey sub 
                         WHERE sub.ps_id_survey = ? 
                         AND sub.ps_status = 0 
-                        AND sub.ps_kode = pertanyaan_survey.ps_kode
+                        AND sub.ps_kode = ps.ps_kode
                         LIMIT 1
                     )
                 END ASC,
                 CASE 
-                    WHEN ps_kode IS NULL OR ps_kode = '' THEN 1 
+                    WHEN ps.ps_kode IS NULL OR ps.ps_kode = '' THEN 1 
                     ELSE 0 
                 END ASC,
-                ps_kode ASC
+                ps.ps_kode ASC
         ";
-
+    
         return $this->db->query($query, array($id, $id));
-    }
+    }    
 
     public function pertanyaan_survey_by_id($id)
     {
