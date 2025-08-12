@@ -133,6 +133,8 @@ class M_Admin extends CI_Model
 
     public function pertanyaan_survey($id)
     {
+        //return $this->db->get_where($mapel, $id_surveyor);
+        // return $this->db->query('SELECT * FROM pertanyaan_survey WHERE ps_id_survey=' . $id . ' AND ps_status=0 ORDER BY ps_id_seksi ASC');
         $query = "
             SELECT ps.* 
             FROM pertanyaan_survey ps
@@ -226,7 +228,7 @@ class M_Admin extends CI_Model
 
     public function count_data_survey_byid($id)
     {
-        $query = $this->db->query("SELECT COUNT(*) AS total FROM jawaban_survey WHERE js_survey_id = ? AND js_valid = '1'", [$id]);
+        $query = $this->db->query("SELECT COUNT(*) AS total FROM jawaban_survey WHERE js_survey_id = ? AND js_valid = '1' AND js_status = '0'", [$id]);
         $row = $query->row(); // gunakan row() bukan getRow()
     
         return $row->total;
