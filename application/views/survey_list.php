@@ -55,23 +55,30 @@
                           
                           else {echo '-'; } ?>
                           <?php } ?></td>
-
                           <td>
                               <?= ($ju->jumlah_survey && $ju->jumlah_survey > 0) 
                                   ? round(($jum['jumsurvey'] / $ju->jumlah_survey) * 100) . '%' 
                                   : '0%'; ?>
                           </td>
+
                           <?php if ($jum['jumsurvey'] < $ju->jumlah_survey) { ?>
-												
-                        <td>
-													<a href="<?= base_url() ?>survey/<?= $ju->id_survey; ?>/<?= date("dmyHis"); ?>/<?= 'data'; ?>"><button class="btn btn-info" style="padding:2px;font-size:0.8em"><i class="fa fa-paper-plane"></i> Kerjakan Survey</button></a>
-												</td>
-											<?php } else { ?>
-												<td>
-
-                        <button class="btn btn-info" style="padding:2px;font-size:0.8em" disabled><i class="fa fa-paper-plane"></i> Kerjakan Survey</button></td>
-						            <?php } ?>
-
+                              <td>
+                                  <a href="<?= base_url() ?>survey/<?= $ju->id_survey; ?>/<?= date("dmyHis"); ?>/<?= 'data'; ?>">
+                                      <button class="btn btn-info" style="padding:2px;font-size:0.8em">
+                                          <i class="fa fa-paper-plane"></i> Kerjakan Survey
+                                      </button>
+                                  </a>
+                              </td>
+                          <?php } else { ?>
+                              <td>
+                                  <button 
+                                      class="btn btn-info" 
+                                      style="padding:2px;font-size:0.8em" 
+                                      onclick="alert('Jumlah survey sudah terpenuhi, hubungi admin jika ingin menambah jumlah survey')">
+                                      <i class="fa fa-paper-plane"></i> Kerjakan Survey
+                                  </button>
+                              </td>
+                          <?php } ?>
                       </tr>
 
                       <!-- Modal -->
