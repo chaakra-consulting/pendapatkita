@@ -57,8 +57,8 @@
                           <?php } ?></td>
 
                           <td>
-                              <?= ($s->jumlah_survey && $s->jumlah_survey > 0) 
-                                  ? round(($jumlah_valid / $s->jumlah_survey) * 100) . '%' 
+                              <?= ($ju->jumlah_survey && $ju->jumlah_survey > 0) 
+                                  ? round(($jumlah_valid / $ju->jumlah_survey) * 100) . '%' 
                                   : '0%'; ?>
                           </td>
                           <?php if ($jum['jumsurvey'] < $ju->jumlah_survey) { ?>
