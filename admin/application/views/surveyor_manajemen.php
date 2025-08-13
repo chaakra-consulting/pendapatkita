@@ -89,7 +89,12 @@
                                             echo $jumlah_valid ?>
                                         </td>
                                         <td><?= $s->jumlah_survey - $jumlah_valid; ?></td>
-                                        <td><?= ($jumlah_valid / $s->jumlah_survey) * 100; ?>%</td>
+                                        <td>
+                                            <?= $s->jumlah_survey > 0 
+                                                ? number_format(($jumlah_valid / $s->jumlah_survey) * 100, 2) . '%' 
+                                                : '0%'; 
+                                            ?>
+                                        </td>
                                         <td>
                                             <div class="row">
                                                 <div class="col-4">
