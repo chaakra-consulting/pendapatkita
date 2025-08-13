@@ -318,6 +318,12 @@ class M_Admin extends CI_Model
 		$this->db->from('pertanyaan_survey');
 		$this->db->where('ps_id_seksi', $id);
 		$this->db->where('ps_status', 0);
+        $this->db->order_by("
+            CASE 
+                WHEN ps_create = '0000-00-00 00:00:00' THEN ps_id
+                ELSE ps_create
+            END
+        ", 'ASC', false);
         // $this->db->order_by('ps_kode', 'ASC');
 		/*
 			if($id==TRUE){
@@ -332,6 +338,12 @@ class M_Admin extends CI_Model
         $this->db->from('pertanyaan_survey');
         $this->db->where('ps_id_seksi', $id);
         $this->db->where('ps_status', 0);
+        $this->db->order_by("
+            CASE 
+                WHEN ps_create = '0000-00-00 00:00:00' THEN ps_id
+                ELSE ps_create
+            END
+        ", 'ASC', false);
         // $this->db->order_by('ps_kode', 'ASC');
         /*
 			if($id==TRUE){

@@ -126,12 +126,13 @@ class M_User extends CI_Model
 		$this->db->from('pertanyaan_survey');
 		$this->db->where('ps_id_seksi', $id);
 		$this->db->where('ps_status', 0);
-		$this->db->order_by('ps_kode', 'ASC');
-		/*
-			if($id==TRUE){
-				$this->db->where('id_seksi',$id);
-			}
-		*/
+		$this->db->order_by("
+			CASE 
+				WHEN ps_create = '0000-00-00 00:00:00' THEN ps_id
+				ELSE ps_create
+			END
+		", 'ASC', false); // false supaya tidak di-escape oleh CI
+	
 		return $this->db->get();
 	}
 
