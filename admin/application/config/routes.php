@@ -61,6 +61,7 @@ $route['survey/(:any)/(:any)'] = 'admin/survey/$1/$2';
 
 
 $route['hasil/(:any)'] = 'admin/hasil/$1';
+$route['hasil/(:any)/(:any)'] = 'admin/hasil/$1/$2';
 
 $route['hasilsurvey'] = 'admin/hasilsurvey';
 $route['coba'] = 'admin/coba';

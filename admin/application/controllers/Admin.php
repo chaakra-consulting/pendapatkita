@@ -378,6 +378,7 @@ class Admin extends CI_Controller
 		$data['title'] = 'survey';
 
 		$data['id'] = $id;
+		$data['id_surveyor'] = $id_surveyor;
 		$data['page'] = $page;
 		$data['listsurvey'] = $this->m_admin->list_survey()->result();
 		if ($page == TRUE && $id == TRUE && $id_surveyor == TRUE) {
@@ -399,7 +400,7 @@ class Admin extends CI_Controller
 		$this->load->view('template/footer-datepicker');
 	}
 
-	public function hasil($id = FALSE)
+	public function hasil($id = FALSE, $id_surveyor = FALSE)
 	{
 		$data['title'] = 'Data Survey';
 		// print_r($data['hasilsurvey']);exit;
@@ -433,7 +434,12 @@ class Admin extends CI_Controller
 			}
 			
 			if ($this->session->status == 'admin') {
-				$data['hasilsurvey'] = $this->m_admin->data_survey_byid($id)->result();
+				//$data['hasilsurvey'] = $this->m_admin->data_survey_byid($id)->result();
+				if ($id == TRUE && $id_surveyor == TRUE) {
+					$data['hasilsurvey'] = $this->db->query("SELECT * FROM jawaban_survey WHERE js_survey_id='" . $id . "' AND js_valid='1' AND js_surveyor=$id_surveyor")->result();
+				} else{
+					$data['hasilsurvey'] = $this->m_admin->data_survey_byid($id)->result();
+				} 
 				$original_questions = $this->m_admin->pertanyaan_survey($id)->result();
 
 				$structured_questions = [];
