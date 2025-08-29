@@ -8,7 +8,11 @@
         <br>
         <div class="main-dashboard-header-right">
             <a href="<?= base_url() ?>"><button class="btn btn-large btn-flat btn-danger"><i class="fa fa-arrow-left"></i> Back</button></a> &nbsp;
-            <a href="<?= base_url() ?>hasil/<?= $id ?>" target="blank_"><button class="btn btn-large btn-flat btn-success"><i class="fa fa-download"></i> Unduh Hasil </button></a> &nbsp;
+            <a href="<?= base_url() ?>hasil/<?= $id ?><?= isset($id_surveyor) && $id_surveyor ? '/' . $id_surveyor : '' ?>" target="_blank">
+                <button class="btn btn-large btn-flat btn-success">
+                    <i class="fa fa-download"></i> Unduh Hasil
+                </button>
+            </a>
         </div>
         <br>
     </div>
