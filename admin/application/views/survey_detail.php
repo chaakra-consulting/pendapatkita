@@ -115,11 +115,24 @@
                                         <div class="form-group">
                                             <label for="nmSurvey">Judul Seksi Survey :</label>
                                             <input type="text" name="nmSurvey" class="form-control" placeholder="Judul Seksi Survey" required>
-                                        </div>  
+                                        </div> 
                                         <div class="form-group">
                                             <label for="nmSurvey">Keterangan Seksi Survey (opsional):</label>
                                             <input type="text" name="ketSurvey" class="form-control" placeholder="Masukkan Keterangan Seksi Survey">
-                                        </div>   
+                                        </div> 
+                                        <div class="form-group">
+                                            <label for="ss_next_seksi">Seksi Survey Selanjutnya:</label>
+                                            <select name="ss_next_seksi" class="form-control" required>
+                                                <option value="">Default</option>
+                                                <?php foreach ($listsurvey as $seksi): ?>
+                                                    <option value="<?= $seksi->id_seksi; ?>">
+                                                        <?= $seksi->ss_kode . ' - ' .$seksi->ss_judul; ?>
+                                                    </option>
+                                                <?php endforeach; ?>
+                                                <option value="validasi">Validasi</option>
+                                            </select>
+                                        </div>
+                                        <br>   
                                     </div>
                                     <div class="box-footer">
 										<input type="hidden" name="idSurvey" value="<?=$infosurvey[0]->id_survey?>">
@@ -659,7 +672,24 @@
                                                 <div class="form-group">
                                                     <label for="NamaSurvey">Keterangan Seksi Survey : (opsional)</label>
                                                     <input type="text" name="ketSurvey" class="form-control" placeholder="Masukkan Nama Survey" value="<?=$lu->ss_keterangan;?>">
-                                                </div>   
+                                                </div>  
+                                                <div class="form-group">
+                                                    <label for="ss_next_seksi">Seksi Survey Selanjutnya:</label>
+                                                    <select name="ss_next_seksi" class="form-control" required>
+                                                        <option value="">Default</option>
+                                                        <?php foreach ($listsurvey as $seksi): ?>
+                                                            <option value="<?= $seksi->id_seksi; ?>"
+                                                                <?= $seksi->id_seksi == $lu->ss_next_seksi ? 'selected' : ''; ?>>
+                                                                <?= $seksi->ss_kode . ' - ' .$seksi->ss_judul; ?>
+                                                            </option>
+                                                        <?php endforeach; ?>
+                                                        <option value="validasi"
+                                                            <?= 'validasi' == $lu->ss_next_seksi ? 'selected' : ''; ?>>
+                                                            Validasi
+                                                        </option>
+                                                    </select>
+                                                </div>
+                                                <br>   
                                             </div>
                                             <div class="box-footer">
 											<input type="hidden" name="idSurvey" value="<?=$lu->ss_id_survey?>">
@@ -692,7 +722,23 @@
                                                     <label for="NamaSurvey">Keterangan Seksi Survey : (opsional)</label>
                                                     <input type="text" name="ketSurvey" class="form-control" placeholder="Masukkan Nama Survey" value="<?=$lu->ss_keterangan;?>">
                                                 </div>  
-
+                                                <div class="form-group">
+                                                    <label for="ss_next_seksi">Seksi Survey Selanjutnya:</label>
+                                                    <select name="ss_next_seksi" class="form-control" required>
+                                                        <option value="">Default</option>
+                                                        <?php foreach ($listsurvey as $seksi): ?>
+                                                            <option value="<?= $seksi->id_seksi; ?>"
+                                                                <?= $seksi->id_seksi == $lu->ss_next_seksi ? 'selected' : ''; ?>>
+                                                                <?= $seksi->ss_kode . ' - ' .$seksi->ss_judul; ?>
+                                                            </option>
+                                                        <?php endforeach; ?>
+                                                        <option value="validasi"
+                                                            <?= 'validasi' == $lu->ss_next_seksi ? 'selected' : ''; ?>>
+                                                            Validasi
+                                                        </option>
+                                                    </select>
+                                                </div>
+                                                <br>  
                                             </div>
 
                                             <div class="box-footer">

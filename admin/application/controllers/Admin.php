@@ -709,6 +709,7 @@ class Admin extends CI_Controller
 		$survey = $this->input->post('nmSurvey');
 		$kode = $this->input->post('KodeSurvey');
 		$ket = $this->input->post('ketSurvey');
+		$nextSeksi = $this->input->post('ss_next_seksi');
 		$data = [
 			'ss_id_survey' => $id_survey,
 			'ss_kode' => $kode,
@@ -716,7 +717,7 @@ class Admin extends CI_Controller
 			'ss_keterangan' => $ket,
 			'ss_creator' => $idUser,
 			'ss_tanggal' => date("Y-m-d H:i:s"),
-
+			'ss_next_seksi' => $nextSeksi,
 		];
 
 		$this->m_admin->t_survey("seksi_survey", $data);
@@ -733,8 +734,8 @@ class Admin extends CI_Controller
 		$survey = $this->input->post('nmSurvey');
 		$kode = $this->input->post('KodeSurvey');
 		$ket = $this->input->post('ketSurvey');
+		$nextSeksi = $this->input->post('ss_next_seksi');
 		
-		// Membuat array data untuk menyimpan informasi seksi baru
 		$seksi_data = [
 			'ss_id_survey' => $id_survey,
 			'ss_kode' => $kode,
@@ -742,6 +743,7 @@ class Admin extends CI_Controller
 			'ss_keterangan' => $ket,
 			'ss_creator' => $idUser,
 			'ss_tanggal' => date("Y-m-d H:i:s"),
+			'ss_next_seksi' => $nextSeksi,
 		];
 	
 		// Menyimpan data seksi baru ke dalam tabel 'seksi_survey'
@@ -779,11 +781,13 @@ class Admin extends CI_Controller
 		$survey = $this->input->post('nmSurvey');
 		$kode = $this->input->post('KodeSurvey');
 		$ket = $this->input->post('ketSurvey');
+		$nextSeksi = $this->input->post('ss_next_seksi');
 		$where = ['id_seksi' => $id_seksi];
 		$data = [
 			'ss_kode' => $kode,
 			'ss_judul' => $survey,
 			'ss_keterangan' => $ket,
+			'ss_next_seksi' => $nextSeksi,
 		];
 
 		$this->m_admin->e_survey($where, 'seksi_survey', $data);

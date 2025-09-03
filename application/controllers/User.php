@@ -259,11 +259,15 @@ class User extends CI_Controller
 		$id_survey = $this->input->post('id_survey');
 		$id_seksi = $this->input->post('id_seksi');
 		$kdseksi = $this->input->post('kdseksi');
-		
+
 		$seksi = $this->m_user->list_seksi_by_id($id_seksi)->row();
 		if($seksi->ss_next_seksi){
-			$seksiNext = $this->m_user->list_seksi_by_id($seksi->ss_next_seksi)->row();
-			$seksiafter = $seksiNext->ss_kode;		
+			if($seksi->ss_next_seksi == 'validasi'){
+				$seksiafter = 'validasi';
+			}else{
+				$seksiNext = $this->m_user->list_seksi_by_id($seksi->ss_next_seksi)->row();
+				$seksiafter = $seksiNext->ss_kode;	
+			}	
 		}
 		// print_r($kdseksi);exit;
 		$kode_survey = $this->input->post('kode_survey');
