@@ -151,6 +151,20 @@ class M_User extends CI_Model
 		return $query->row(); 
 	}
 
+	function list_seksi_by_id($id = FALSE)
+	{
+		$this->db->select('*');
+		$this->db->from('seksi_survey');
+		$this->db->join('survey', 'seksi_survey.ss_id_survey=survey.id_survey');
+		$this->db->where('ss_status', 0);
+
+		if ($id == TRUE) {
+			$this->db->where('id_seksi', $id);
+		}
+
+		return $this->db->get();
+	}
+
 	function list_seksi_by_survey($id = FALSE)
 	{
 		$this->db->select('*');

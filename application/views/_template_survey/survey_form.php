@@ -60,10 +60,12 @@
 								$a = array(1 => 'one', 2 => 'two', 3 => 'three');
 								$aplink = array();
 								$aplink[] = 'data';
+								$id_seksi = null;
 								foreach ($list_seksi as $ds) {
 									$no++;
 									$aplink[] = $ds->ss_kode;
 									if ($kdseksi == $ds->ss_kode) {
+										$id_seksi = $ds->id_seksi;
 										$lds = 'active';
 									} else {
 										$lds = '';
@@ -78,6 +80,7 @@
 								}
 								$aplink[] = 'validasi';
 								$aplink[] = 'upload';
+
 								//CekForm Berikutnya
 								$palink = array_keys($aplink, $kdseksi, false);
 								$aplinkafter = $palink[0] + 1;
@@ -124,6 +127,7 @@
 								</div>
 								<div class="card-body">
 									<input type="hidden" name="id_survey" value="<?= $id_survey ?>">
+									<input type="hidden" name="id_seksi" value="<?= $id_seksi; ?>">
 									<input type="hidden" name="kdseksi" value="<?= $kdseksi; ?>">
 									<input type="hidden" name="kode_survey" value="<?= $kode_survey ?>">
 									<input type="hidden" name="target_link" id="target_link" value="">
