@@ -257,7 +257,15 @@ class User extends CI_Controller
 		$id_surveyor = $this->session->id;
 
 		$id_survey = $this->input->post('id_survey');
+		$id_seksi = $this->input->post('id_seksi');
 		$kdseksi = $this->input->post('kdseksi');
+		
+		$seksi = $this->m_user->list_seksi_by_id($id_seksi)->row();
+		if($seksi->ss_next_seksi){
+			$seksiNext = $this->m_user->list_seksi_by_id($seksi->ss_next_seksi)->row();
+			$seksiafter = $seksiNext->ss_kode;		
+		}
+		// print_r($kdseksi);exit;
 		$kode_survey = $this->input->post('kode_survey');
 		$target_link = $this->input->post('target_link');
 		if ($target_link != NULL) {
@@ -583,7 +591,6 @@ class User extends CI_Controller
 		$data['detil_survey'] = $cek_detil_tes;
 		$data['list_seksi'] = $this->m_user->list_seksi_by_survey($id_survey)->result();
 		$data['title'] = $cek_detil_tes->nama_survey;
-
 
 		$this->load->view('_template/header', $data);
 		$this->load->view('_template_survey/survey');
