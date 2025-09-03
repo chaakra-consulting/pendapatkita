@@ -122,7 +122,7 @@
                                         </div> 
                                         <div class="form-group">
                                             <label for="ss_next_seksi">Seksi Survey Selanjutnya:</label>
-                                            <select name="ss_next_seksi" class="form-control" required>
+                                            <select name="ss_next_seksi" class="form-control">
                                                 <option value="">Default</option>
                                                 <?php foreach ($listsurvey as $seksi): ?>
                                                     <option value="<?= $seksi->id_seksi; ?>">
@@ -675,7 +675,7 @@
                                                 </div>  
                                                 <div class="form-group">
                                                     <label for="ss_next_seksi">Seksi Survey Selanjutnya:</label>
-                                                    <select name="ss_next_seksi" class="form-control" required>
+                                                    <select name="ss_next_seksi" class="form-control">
                                                         <option value="">Default</option>
                                                         <?php foreach ($listsurvey as $seksi): ?>
                                                             <option value="<?= $seksi->id_seksi; ?>"
@@ -724,7 +724,7 @@
                                                 </div>  
                                                 <div class="form-group">
                                                     <label for="ss_next_seksi">Seksi Survey Selanjutnya:</label>
-                                                    <select name="ss_next_seksi" class="form-control" required>
+                                                    <select name="ss_next_seksi" class="form-control">
                                                         <option value="">Default</option>
                                                         <?php foreach ($listsurvey as $seksi): ?>
                                                             <option value="<?= $seksi->id_seksi; ?>"
