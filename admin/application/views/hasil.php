@@ -159,6 +159,54 @@
 <script src="https://cdn.jsdelivr.net/npm/exceljs@4.3.0/dist/exceljs.min.js"></script>
 
 <script type="text/javascript">
+async function loadAndCompressImage(imgUrl, maxSizeKB = 200) {
+    return new Promise(async (resolve, reject) => {
+        try {
+            const response = await fetch(imgUrl);
+            const blob = await response.blob();
+
+            const img = new Image();
+            img.crossOrigin = "anonymous";
+            img.onload = () => {
+                const canvas = document.createElement("canvas");
+                const ctx = canvas.getContext("2d");
+
+                const maxWidth = 400;
+                let width = img.width;
+                let height = img.height;
+
+                if (width > maxWidth) {
+                    height *= maxWidth / width;
+                    width = maxWidth;
+                }
+
+                canvas.width = width;
+                canvas.height = height;
+                ctx.drawImage(img, 0, 0, width, height);
+
+                let quality = 0.9;
+                const tryCompress = () => {
+                    canvas.toBlob(async (compressedBlob) => {
+                        if (!compressedBlob) return reject("Gagal compress blob");
+                        if (compressedBlob.size / 1024 <= maxSizeKB || quality < 0.3) {
+                            const buffer = await compressedBlob.arrayBuffer();
+                            resolve({ buffer, ext: "jpeg" });
+                        } else {
+                            quality -= 0.1;
+                            canvas.toBlob(tryCompress, "image/jpeg", quality);
+                        }
+                    }, "image/jpeg", quality);
+                };
+                tryCompress();
+            };
+            img.onerror = reject;
+            img.src = URL.createObjectURL(blob);
+        } catch (err) {
+            reject(err);
+        }
+    });
+}
+
 async function exportToExcel(includeFoto = true) {
     const filename = `Survey <?= htmlspecialchars($lssu->nama_survey, ENT_QUOTES); ?>${includeFoto ? '' : '-tanpa-foto'}.xlsx`;
 
@@ -177,9 +225,6 @@ async function exportToExcel(includeFoto = true) {
 
         for (let idx = 0; idx < cells.length; idx++) {
             const cell = cells[idx];
-
-            // if (!includeFoto && idx === cells.length - 1) continue;
-
             while (occupied[excelRow + ',' + col]) col++;
 
             const rowspan = parseInt(cell.getAttribute('rowspan') || 1, 10);
@@ -194,29 +239,25 @@ async function exportToExcel(includeFoto = true) {
                     const imgUrl = img.getAttribute("src") || img.getAttribute("data-src");
                     if (imgUrl) {
                         try {
-                            const response = await fetch(imgUrl);
-                            const blob = await response.blob();
-                            const buffer = await blob.arrayBuffer();
-
-                            let ext = 'png';
-                            if (blob.type.includes("jpeg")) ext = 'jpeg';
-                            if (blob.type.includes("jpg")) ext = 'jpg';
+                            const { buffer, ext } = await loadAndCompressImage(imgUrl, 500);
 
                             const imageId = workbook.addImage({
                                 buffer: buffer,
                                 extension: ext
                             });
 
-							worksheet.addImage(imageId, {
-								tl: { col: col - 1 + imgIndex, row: excelRow - 1 },
-								ext: { width: 80, height: 80 }
-							});
+                            worksheet.addImage(imageId, {
+                                tl: { col: col - 1 + imgIndex, row: excelRow - 1 },
+                                ext: { width: 80, height: 80 }
+                            });
+
                             imgIndex++;
                         } catch (e) {
-                            console.error("Gagal load gambar:", imgUrl, e);
+                            console.error("Gagal load/compress gambar:", imgUrl, e);
                         }
                     }
                 }
+                worksheet.getRow(excelRow).height = 65;
             } else {
                 const a = cell.querySelector('a');
                 if (a) {
