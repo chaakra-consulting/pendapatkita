@@ -23,7 +23,8 @@
 	<h2>Hasil Survey</h2>
 	<h4><?= $lssu->nama_survey; ?></h4>
 </div>
-<button id="exportBtn1">Export To Excel</button><br><br>
+<button id="exportBtn2">Export To Excel</button>
+<button id="exportBtn1">Export To Excel (Dengan Foto)</button><br><br>
 
 <table id="tab1" style="border-collapse: collapse; width: 100%; font-family: Arial, sans-serif; font-size: 12px;">
 	<thead>
@@ -137,28 +138,155 @@
 					<?php endif; ?>
 				<?php endforeach; ?>
 				<td>
-					<?php
+				<?php
 					$array_foto = json_decode($hsl->js_foto, TRUE);
-					echo (is_array($array_foto) && count($array_foto) > 0) ? implode('<br>', $array_foto) : htmlspecialchars($hsl->js_foto);
+					// print_r($hsl->js_foto);exit;
+					if (is_array($array_foto)) {
+						if (count($array_foto) > 0) {
+							for ($i = 0; $i < count($array_foto); $i++) { ?>
+								<img data-src="<?= base_url(); ?>./../assets/validasi/<?= $array_foto[$i] ?>" class="lazyload" style="width:100px;">
+						<?php }
+						}
+					}
+					// echo (is_array($array_foto) && count($array_foto) > 0) ? implode('<br>', $array_foto) : htmlspecialchars($hsl->js_foto);
 					?>
 				</td>
 			</tr>
 		<?php endforeach; ?>
 	</tbody>
 </table>
-<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script> 
+<!-- tambahkan CDN ExcelJS sebelum script ekspor -->
+<script src="https://cdn.jsdelivr.net/npm/exceljs@4.3.0/dist/exceljs.min.js"></script>
 
-<script src="https://cdn.jsdelivr.net/gh/linways/table-to-excel@v1.0.4/dist/tableToExcel.js"></script>
 <script type="text/javascript">
-	$(document).ready(function() {
-		$("#exportBtn1").click(function() {
-			TableToExcel.convert(document.getElementById("tab1"), {
-				name: "Survey <?= htmlspecialchars($lssu->nama_survey, ENT_QUOTES); ?>.xlsx",
-				sheet: {
-					name: "PendapatKitaApps"
-				}
-			});
-		});
-	});
+async function exportToExcel(includeFoto = true) {
+    const filename = `Survey <?= htmlspecialchars($lssu->nama_survey, ENT_QUOTES); ?>${includeFoto ? '' : '-tanpa-foto'}.xlsx`;
+
+    const workbook = new ExcelJS.Workbook();
+    const worksheet = workbook.addWorksheet('PendapatKitaApps');
+
+    const table = document.getElementById('tab1');
+    const rows = Array.from(table.querySelectorAll('tr'));
+
+    const occupied = {};
+    let excelRow = 1;
+
+    for (const tr of rows) {
+        const cells = Array.from(tr.children).filter(c => c.tagName === 'TD' || c.tagName === 'TH');
+        let col = 1;
+
+        for (let idx = 0; idx < cells.length; idx++) {
+            const cell = cells[idx];
+
+            // if (!includeFoto && idx === cells.length - 1) continue;
+
+            while (occupied[excelRow + ',' + col]) col++;
+
+            const rowspan = parseInt(cell.getAttribute('rowspan') || 1, 10);
+            const colspan = parseInt(cell.getAttribute('colspan') || 1, 10);
+
+            const imgs = cell.querySelectorAll("img");
+            if (imgs.length > 0 && includeFoto) {
+                worksheet.getRow(excelRow).getCell(col).value = "";
+
+                let imgIndex = 0;
+                for (let img of imgs) {
+                    const imgUrl = img.getAttribute("src") || img.getAttribute("data-src");
+                    if (imgUrl) {
+                        try {
+                            const response = await fetch(imgUrl);
+                            const blob = await response.blob();
+                            const buffer = await blob.arrayBuffer();
+
+                            let ext = 'png';
+                            if (blob.type.includes("jpeg")) ext = 'jpeg';
+                            if (blob.type.includes("jpg")) ext = 'jpg';
+
+                            const imageId = workbook.addImage({
+                                buffer: buffer,
+                                extension: ext
+                            });
+
+							worksheet.addImage(imageId, {
+								tl: { col: col - 1 + imgIndex, row: excelRow - 1 },
+								ext: { width: 80, height: 80 }
+							});
+                            imgIndex++;
+                        } catch (e) {
+                            console.error("Gagal load gambar:", imgUrl, e);
+                        }
+                    }
+                }
+            } else {
+                const a = cell.querySelector('a');
+                if (a) {
+                    const href = a.href;
+                    const text = (a.textContent || href).trim();
+                    worksheet.getRow(excelRow).getCell(col).value = { text: text, hyperlink: href };
+                    worksheet.getRow(excelRow).getCell(col).font = { color: { argb: "FF0000FF" }, underline: true };
+                } else {
+                    let text = cell.innerText || '';
+                    text = text.replace(/\u00A0/g, ' ').trim();
+                    worksheet.getRow(excelRow).getCell(col).value = text;
+                }
+            }
+
+            if (rowspan > 1 || colspan > 1) {
+                const startRow = excelRow;
+                const startCol = col;
+                const endRow = excelRow + rowspan - 1;
+                const endCol = col + colspan - 1;
+                worksheet.mergeCells(startRow, startCol, endRow, endCol);
+
+                for (let r = startRow; r <= endRow; r++) {
+                    for (let c = startCol; c <= endCol; c++) {
+                        occupied[r + ',' + c] = true;
+                    }
+                }
+            } else {
+                occupied[excelRow + ',' + col] = true;
+            }
+
+            col += colspan;
+        }
+        excelRow++;
+    }
+
+    const maxCol = Math.max(...Object.keys(occupied).map(k => parseInt(k.split(',')[1], 10)));
+    for (let c = 1; c <= (isFinite(maxCol) ? maxCol : 1); c++) {
+        let maxLen = 8;
+        for (let r = 1; r < excelRow; r++) {
+            const cell = worksheet.getRow(r).getCell(c);
+            if (cell && cell.value) {
+                let v = cell.value;
+                let len = 0;
+                if (typeof v === 'object' && v.text) len = v.text.length;
+                else len = ('' + v).length;
+                if (len > maxLen) maxLen = len;
+            }
+        }
+        worksheet.getColumn(c).width = Math.min(60, maxLen + 2);
+    }
+
+    try {
+        const buffer = await workbook.xlsx.writeBuffer();
+        const blob = new Blob([buffer], { type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' });
+        const link = document.createElement('a');
+        link.href = URL.createObjectURL(blob);
+        link.download = filename;
+        document.body.appendChild(link);
+        link.click();
+        link.remove();
+        URL.revokeObjectURL(link.href);
+    } catch (err) {
+        console.error('Export error', err);
+        alert('Gagal men-generate file Excel di browser. Cek console untuk detail.');
+    }
+}
+
+document.getElementById('exportBtn1').addEventListener('click', () => exportToExcel(true));
+document.getElementById('exportBtn2').addEventListener('click', () => exportToExcel(false));
 </script>
+
+
 </html>
