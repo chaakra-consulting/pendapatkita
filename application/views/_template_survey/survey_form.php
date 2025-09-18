@@ -158,12 +158,12 @@
 															</div>
 															<div class="col-md-6">
 																<div class="form-group">
-																	<label>Kode Responden</label>
+																	<label>Kode</label>
 																	<input type="text" name="koderesponden" class="form-control" placeholder="Kode Responden ..." value="<?= $koderesponden; ?>">
 																</div>
 																<div class="form-group">
-																	<label>Nama Responden</label>
-																	<input type="text" name="namaresponden" class="form-control" placeholder="Nama Responden ..." required value="<?= $namaresponden; ?>">
+																	<label>Nama Perusahaan</label>
+																	<input type="text" name="namaresponden" class="form-control" placeholder="Nama Perusahaan ..." required value="<?= $namaresponden; ?>">
 																</div>
 															</div>
 														</div>
