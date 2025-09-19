@@ -762,6 +762,8 @@ class Admin extends CI_Controller
 				'ps_pertanyaan' => $pertanyaan->ps_pertanyaan,
 				'ps_tipe_pertanyaan' => $pertanyaan->ps_tipe_pertanyaan,
 				'ps_pilihan_jawaban' => $pertanyaan->ps_pilihan_jawaban,
+				'type_data' => $pertanyaan->type_data,
+				'must_answer' => $pertanyaan->must_answer,
 			];
 	
 			// Menyimpan pertanyaan baru ke dalam tabel 'pertanyaan_survey'
