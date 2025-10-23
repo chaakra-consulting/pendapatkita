@@ -278,7 +278,7 @@ function tipepertanyaan($idtipe)
                                     </div>
                                     <div class="col-sm-2">
                                         <p class="form-control-static">
-                                            <input type="text" class="form-control" name="logicja[]" value="<?= $logic ?>" placeholder="Logic" <?= $is_jawaban == 1 ? 'readonly' : '' ?>>
+                                            <input type="text" class="form-control" name="logicja[]" value="<?= $logic ?>" placeholder="Logic">
                                         </p>
                                     </div>
                                     <?php if ($is_jawaban == 0): ?>
@@ -339,7 +339,7 @@ function tipepertanyaan($idtipe)
                                         <p class="form-control-static"><input type="text" class="form-control" id="pilja" name="pilja[]" value ="<?= $isi ?>" placeholder="Pilihan Jawaban" <?= $is_jawaban == 1 ? 'readonly' : '' ?>></p>
                                     </div>
                                     <div class="col-sm-2">
-                                        <p class="form-control-static"><input type="text" class="form-control" id="logicja" name="logicja[]" value ="<?= $logic ?>" placeholder="Logic" <?= $is_jawaban == 1 ? 'readonly' : '' ?>></p>
+                                        <p class="form-control-static"><input type="text" class="form-control" id="logicja" name="logicja[]" value ="<?= $logic ?>" placeholder="Logic"></p>
                                     </div>
                                     <?php if ($is_jawaban == 0): ?>
                                     <div class="col-sm-3">
