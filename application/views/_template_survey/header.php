@@ -69,12 +69,12 @@
     }
 
     .slider-label-left {
-      text-align: center;
+      text-align: left;
       margin-right: 15px;
     }
 
     .slider-label-right {
-      text-align: center;
+      text-align: right;
       margin-left: 15px;
       /* margin-right: 0; */
     }
@@ -101,8 +101,14 @@
 
     @media (max-width: 768px) {
       .slider-wrapper {
+        /* flex-wrap: wrap;
+        gap: 4px; */
+        display: flex;
         flex-wrap: wrap;
+        align-items: flex-start;
+        justify-content: space-between;
         gap: 4px;
+        margin-bottom: 1rem;
       }
 
       .slider-label {
