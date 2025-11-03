@@ -521,136 +521,136 @@
 																			$paklo = '';
 																			$pakwar = '<p class="form-control-static"><textarea class="form-control"  name="' . $ta->ps_id . '" rows="5" data-psid="' . $ta->ps_id . '" data-required="' . $isRequired . '">' . $PilJabIsi . '</textarea>';
 																			// $lnk2 = $lnk;
-																		} elseif ($ta->ps_tipe_pertanyaan == 5) {
-																			$pilja = explode(';', $piljab);
-																			// foreach ($pilja as $pj) {
-																			$pj = $pilja[0];
-																			if ($pj != '') {
-																				$pillo = explode(':', $pj);
-																				if ($pillo[1] != '') {
-																					//Link Data
-																					$PgKar = $this->uri->segment(4); //Karakter Halaman
-																					$dataPgKar = $pillo[1]; //DataLink
-																					$wordsPGKar = trim($dataPgKar, "0..9");
-																					if ($PgKar == $wordsPGKar) {
-																						$lnk = '<a href="#' . $pillo[1] . '">[ ' . $pillo[1] . ' ]</a>';
-																					} else {
-																						$lnk = '<a href="#' . $pillo[1] . '"  data-value="' . $pillo[1] . '"  onclick="capture(this);">[ ' . $pillo[1] . ' ]</a>';
+																				} elseif ($ta->ps_tipe_pertanyaan == 5) {
+																					$pilja = explode(';', $piljab);
+																					// foreach ($pilja as $pj) {
+																					$pj = $pilja[0];
+																					if ($pj != '') {
+																						$pillo = explode(':', $pj);
+																						if ($pillo[1] != '') {
+																							//Link Data
+																							$PgKar = $this->uri->segment(4); //Karakter Halaman
+																							$dataPgKar = $pillo[1]; //DataLink
+																							$wordsPGKar = trim($dataPgKar, "0..9");
+																							if ($PgKar == $wordsPGKar) {
+																								$lnk = '<a href="#' . $pillo[1] . '">[ ' . $pillo[1] . ' ]</a>';
+																							} else {
+																								$lnk = '<a href="#' . $pillo[1] . '"  data-value="' . $pillo[1] . '"  onclick="capture(this);">[ ' . $pillo[1] . ' ]</a>';
+																							}
+																						} else {
+																							$lnk = '';
+																						}
+																						$lnk2 = $lnk;
 																					}
-																				} else {
-																					$lnk = '';
-																				}
-																				$lnk2 = $lnk;
-																			}
-																			$range_text = explode(':', $pilja[1])[0];
-																			// }
-																			$paklo = '';
-																			$jenis_likert = explode(':', explode(';', $piljab)[0])[0];
-																			if ($jenis_likert == 'star') {
-																				$pakwar = '
-																	<div class="rating-stars block" id="rating">
-																		<input type="hidden" class="rating-value" name="' . $ta->ps_id . '" id="rating-stars-value" value="' . $PilJabIsi . '"  data-psid="' . $ta->ps_id . '" data-required="' . $isRequired . '">
-																		<div class="rating-stars-container">
-																			<div class="rating-star">
-																				<i class="fa fa-star"></i>
-																			</div>
-																			<div class="rating-star">
-																				<i class="fa fa-star"></i>
-																			</div>
-																			<div class="rating-star">
-																				<i class="fa fa-star"></i>
-																			</div>
-																			<div class="rating-star">
-																				<i class="fa fa-star"></i>
-																			</div>
-																			<div class="rating-star">
-																				<i class="fa fa-star"></i>
-																			</div>
-																		</div>
-																		' . $range_text . '
-																	</div>
-																	';
-																			} elseif ($jenis_likert == 'love') {
-																				$pakwar = '
-																	<div class="rating-stars block" id="rating">
-																		<input type="hidden" class="rating-value" name="' . $ta->ps_id . '" id="another-rating-stars-value" value="' . $PilJabIsi . '"  data-psid="' . $ta->ps_id . '" data-required="' . $isRequired . '">
-																		<div class="rating-stars-container">
-																			<div class="rating-star">
-																				<i class="fa fa-heart"></i>
-																			</div>
-																			<div class="rating-star">
-																				<i class="fa fa-heart"></i>
-																			</div>
-																			<div class="rating-star">
-																				<i class="fa fa-heart"></i>
-																			</div>
-																			<div class="rating-star">
-																				<i class="fa fa-heart"></i>
-																			</div>
-																			<div class="rating-star">
-																				<i class="fa fa-heart"></i>
-																			</div>
-																		</div>
-																		' . $range_text . '
-																	</div>
-																	';
-																			} elseif ($jenis_likert == 'bar') {
-																				$se = [];
-																				for ($i = 1; $i <= 10; $i++) {
-																					if ($PilJabIsi == "$i") {
-																						array_push($se, ' selected="selected"');
-																					} else {
-																						array_push($se, ' ');
-																					}
-																				}
-																				$pakwar = '
-																	<div class="box-example-1to10 mb-5">
-																		<div class="body">
-																			<select id="example-1to10" name="' . $ta->ps_id . '" autocomplete="off">
-																				<option value="1"' . $se[0] . '>1</option>
-																				<option value="2"' . $se[1] . '>2</option>
-																				<option value="3"' . $se[2] . '>3</option>
-																				<option value="4"' . $se[3] . '>4</option>
-																				<option value="5"' . $se[4] . '>5</option>
-																				<option value="6"' . $se[5] . '>6</option>
-																				<option value="7"' . $se[6] . '>7</option>
-																				<option value="8"' . $se[7] . '>8</option>
-																				<option value="9"' . $se[8] . '>9</option>
-																				<option value="10"' . $se[9] . '>10</option>
-																			</select>
-																		</div>
-																	</div>';
-																			} elseif ($jenis_likert == 'opini') {
-																				$se = [];
-																				if ($PilJabIsi == "buruk") {
-																					array_push($se, ' selected="selected"');
-																				} else {
-																					array_push($se, ' ');
-																				}
-																				if ($PilJabIsi == "biasa") {
-																					array_push($se, ' selected="selected"');
-																				} else {
-																					array_push($se, ' ');
-																				}
-																				if ($PilJabIsi == "bagus") {
-																					array_push($se, ' selected="selected"');
-																				} else {
-																					array_push($se, ' ');
-																				}
-																				if ($PilJabIsi == "luar biasa") {
-																					array_push($se, ' selected="selected"');
-																				} else {
-																					array_push($se, ' ');
-																				}
-																				$pakwar = '
-																	<div class="border-0 p-0 box-example-movie mb-5">
-																<div class="box-body">
-																	<select id="example-movie" name="' . $ta->ps_id . '" autocomplete="off" data-psid="' . $ta->ps_id . '" data-required="' . $isRequired . '">
-																		<option value="buruk"' . $se[0] . '>Buruk</option>
-																		<option value="biasa"' . $se[1] . '>Biasa Saja</option>
-																		<option value="bagus"' . $se[2] . '>Bagus</option>
-																		<option value="luar biasa"' . $se[3] . '>Luar Biasa</option>
-																	</select>
+																					$range_text = explode(':', $pilja[1])[0];
+																					// }
+																					$paklo = '';
+																					$jenis_likert = explode(':', explode(';', $piljab)[0])[0];
+																					if ($jenis_likert == 'star') {
+																						$pakwar = '
+																						<div class="rating-stars block" id="rating">
+																							<input type="hidden" class="rating-value" name="' . $ta->ps_id . '" id="rating-stars-value" value="' . $PilJabIsi . '"  data-psid="' . $ta->ps_id . '" data-required="' . $isRequired . '">
+																							<div class="rating-stars-container">
+																								<div class="rating-star">
+																									<i class="fa fa-star"></i>
+																								</div>
+																								<div class="rating-star">
+																									<i class="fa fa-star"></i>
+																								</div>
+																								<div class="rating-star">
+																									<i class="fa fa-star"></i>
+																								</div>
+																								<div class="rating-star">
+																									<i class="fa fa-star"></i>
+																								</div>
+																								<div class="rating-star">
+																									<i class="fa fa-star"></i>
+																								</div>
+																							</div>
+																							' . $range_text . '
+																						</div>
+																						';
+																					} elseif ($jenis_likert == 'love') {
+																						$pakwar = '
+																						<div class="rating-stars block" id="rating">
+																							<input type="hidden" class="rating-value" name="' . $ta->ps_id . '" id="another-rating-stars-value" value="' . $PilJabIsi . '"  data-psid="' . $ta->ps_id . '" data-required="' . $isRequired . '">
+																							<div class="rating-stars-container">
+																								<div class="rating-star">
+																									<i class="fa fa-heart"></i>
+																								</div>
+																								<div class="rating-star">
+																									<i class="fa fa-heart"></i>
+																								</div>
+																								<div class="rating-star">
+																									<i class="fa fa-heart"></i>
+																								</div>
+																								<div class="rating-star">
+																									<i class="fa fa-heart"></i>
+																								</div>
+																								<div class="rating-star">
+																									<i class="fa fa-heart"></i>
+																								</div>
+																							</div>
+																							' . $range_text . '
+																						</div>
+																						';
+																					} elseif ($jenis_likert == 'bar') {
+																						$se = [];
+																						for ($i = 1; $i <= 10; $i++) {
+																							if ($PilJabIsi == "$i") {
+																								array_push($se, ' selected="selected"');
+																							} else {
+																								array_push($se, ' ');
+																							}
+																						}
+																						$pakwar = '
+																						<div class="box-example-1to10 mb-5">
+																							<div class="body">
+																								<select id="example-1to10" name="' . $ta->ps_id . '" autocomplete="off">
+																									<option value="1"' . $se[0] . '>1</option>
+																									<option value="2"' . $se[1] . '>2</option>
+																									<option value="3"' . $se[2] . '>3</option>
+																									<option value="4"' . $se[3] . '>4</option>
+																									<option value="5"' . $se[4] . '>5</option>
+																									<option value="6"' . $se[5] . '>6</option>
+																									<option value="7"' . $se[6] . '>7</option>
+																									<option value="8"' . $se[7] . '>8</option>
+																									<option value="9"' . $se[8] . '>9</option>
+																									<option value="10"' . $se[9] . '>10</option>
+																								</select>
+																							</div>
+																						</div>';
+																					} elseif ($jenis_likert == 'opini') {
+																						$se = [];
+																						if ($PilJabIsi == "buruk") {
+																							array_push($se, ' selected="selected"');
+																						} else {
+																							array_push($se, ' ');
+																						}
+																						if ($PilJabIsi == "biasa") {
+																							array_push($se, ' selected="selected"');
+																						} else {
+																							array_push($se, ' ');
+																						}
+																						if ($PilJabIsi == "bagus") {
+																							array_push($se, ' selected="selected"');
+																						} else {
+																							array_push($se, ' ');
+																						}
+																						if ($PilJabIsi == "luar biasa") {
+																							array_push($se, ' selected="selected"');
+																						} else {
+																							array_push($se, ' ');
+																						}
+																						$pakwar = '
+																					<div class="border-0 p-0 box-example-movie mb-5">
+																				<div class="box-body">
+																					<select id="example-movie" name="' . $ta->ps_id . '" autocomplete="off" data-psid="' . $ta->ps_id . '" data-required="' . $isRequired . '">
+																						<option value="buruk"' . $se[0] . '>Buruk</option>
+																						<option value="biasa"' . $se[1] . '>Biasa Saja</option>
+																						<option value="bagus"' . $se[2] . '>Bagus</option>
+																						<option value="luar biasa"' . $se[3] . '>Luar Biasa</option>
+																					</select>
 																									</div>
 																								</div>';
 																			} else {
@@ -663,50 +663,132 @@
 																					}
 																				}
 																				$pakwar = '
-																<div class="border-0 p-0 box-example-square mb-5">
-																	<div class="box-body">
-																		<select id="example-square" name="' . $ta->ps_id . '" autocomplete="off" data-psid="' . $ta->ps_id . '" data-required="' . $isRequired . '">
-																			<option value="1"' . $se[0] . '>1</option>
-																			<option value="2"' . $se[1] . '>2</option>
-																			<option value="3"' . $se[2] . '>3</option>
-																			<option value="4"' . $se[3] . '>4</option>
-																			<option value="5"' . $se[4] . '>5</option>
-																		</select>
-																	</div>
-																</div>';
+																			<div class="border-0 p-0 box-example-square mb-5">
+																				<div class="box-body">
+																					<select id="example-square" name="' . $ta->ps_id . '" autocomplete="off" data-psid="' . $ta->ps_id . '" data-required="' . $isRequired . '">
+																						<option value="1"' . $se[0] . '>1</option>
+																						<option value="2"' . $se[1] . '>2</option>
+																						<option value="3"' . $se[2] . '>3</option>
+																						<option value="4"' . $se[3] . '>4</option>
+																						<option value="5"' . $se[4] . '>5</option>
+																					</select>
+																				</div>
+																			</div>';
 																			}
 																			// $lnk2 = $lnk;
 																		} elseif ($ta->ps_tipe_pertanyaan == 6) {
 																			$pilja = explode(';', $piljab);
-																			foreach ($pilja as $pj) {
-																				if ($pj != '') {
-																					$pillo = explode(':', $pj);
-																					if ($pillo[1] != '') {
-																						//$lnk='<a href="#'.$pillo[1].'">[ '.$pillo[1].' ]</a>';
-																						//Link Data
-																						$PgKar = $this->uri->segment(4); //Karakter Halaman
-																						$dataPgKar = $pillo[1]; //DataLink
-																						$wordsPGKar = trim($dataPgKar, "0..9");
-																						if ($PgKar == $wordsPGKar) {
-																							//echo 'tetap';
-																							$lnk = '<a href="#' . $pillo[1] . '">[ ' . $pillo[1] . ' ]</a>';
-																						} else {
-																							//echo 'beda';
-																							$lnk = '<a href="#' . $pillo[1] . '"  data-value="' . $pillo[1] . '"  onclick="capture(this);">[ ' . $pillo[1] . ' ]</a>';
-																						}
-																						//===================================
-																					} else {
-																						$lnk = '';
-																					}
-																					if ($PilJabIsi == $pillo[0] && $HitIsian > 0 && $ctTanya == $ta->ps_id) {
-																						$radCheck = 'checked';
-																					} else {
-																						$radCheck = '';
-																					}
-																					$pakwar .= '<div class="radio"><label><input type="radio" name="' . $ta->ps_id . '" id="' . $ta->ps_id . '" value="' . $pillo[0] . '" data-psid="' . $ta->ps_id . '" data-required="' . $isRequired . '"> ' . $pillo[0] . ' ' . $lnk . '</label></div>';
-																					$paklo = $pillo[1];
+																			//$PilJabIsiArray = explode(',', $PilJabIsi);
+																			// print_r($PilJabIsi);exit;
+																			$level = '';
+																			$logic = '';
+																			$aspectLeft = '';
+																			$descLeft = '';
+																			$aspectRight = '';
+																			$descRight = '';
+																			foreach ($pilja as $key => $pj) {
+																				if (trim($pj) === '') continue;
+																				$pillo = explode(':', $pj);
+																				//print_r($pillo);exit;
+
+																				if($key == 0){
+																					$level = $pillo[0] ? trim($pillo[0]) : ''; 
+																					$logic = $pillo[1] ? $pillo[1] : ''; 
+																					//print_r($key);exit;
+																				}elseif($key == 1){
+																					$aspectLeft = $pillo[0]; 
+																					$descLeft = $pillo[1]; 
+																					//print_r($aspectLeft);exit;
+																				}elseif($key == 2){
+																					$aspectRight = $pillo[0]; 
+																					$descRight = $pillo[1]; 
+																					//print_r($descRight);exit;
 																				}
+																				//print_r($aspectLeft);exit;
 																			}
+																			$pakwar .= <<<HTML
+																				<div class="slider-wrapper">
+																					<!-- KIRI -->
+																					<div class="slider-label slider-label-left">
+																						<strong>{$aspectLeft}</strong><br>
+																						<span>{$descLeft}</span>
+																					</div>
+
+																					<!-- SLIDER -->
+																					<div class="slider-box">
+																						<div id="slider-combined-options-{$ta->ps_id}" style="margin:20px 0;"></div>
+																						<input type="hidden" id="slider_value_{$ta->ps_id}" name="{$ta->ps_id}" value="{$PilJabIsi}" />
+																					</div>
+
+																					<!-- KANAN -->
+																					<div class="slider-label slider-label-right">
+																						<strong>{$aspectRight}</strong><br>
+																						<span>{$descRight}</span>
+																					</div>
+																				</div>
+
+																				<script>
+																				(function() {
+																					const level = {$level};
+																					const slider = document.getElementById("slider-combined-options-{$ta->ps_id}");
+																					if (!slider) return;
+
+																					const values = [];
+																					for (let i = level; i >= 1; i--) values.push(i);
+																					for (let i = 2; i <= level; i++) values.push(i);
+
+																					if (values.length === 0) return;
+
+																					const inputHidden = document.getElementById("slider_value_{$ta->ps_id}");
+																					const midIndex = Math.floor(values.length / 2);
+																					const pilJabIsi = "{$PilJabIsi}";
+
+																					let startIndex = midIndex; // default di tengah
+
+																					// Tentukan posisi awal dari nilai PilJabIsi
+																					if (pilJabIsi) {
+																						const [num, side] = pilJabIsi.split("-");
+																						const number = parseInt(num, 10);
+
+																						if (!isNaN(number)) {
+																							if (side === "kiri") {
+																								// hitung index dari kiri
+																								startIndex = level - number; 
+																							} else if (side === "kanan") {
+																								startIndex = midIndex + (number - 1);
+																							} else {
+																								// kalau tanpa kiri/kanan, pas di tengah
+																								startIndex = midIndex;
+																							}
+																						}
+																					}
+
+																					noUiSlider.create(slider, {
+																						start: [startIndex],
+																						step: 1,
+																						range: { min: 0, max: values.length - 1 },
+																						tooltips: {
+																							to: v => values[Math.round(v)] || ""
+																						},
+																						pips: {
+																							mode: "steps",
+																							stepped: true,
+																							density: 5,
+																							format: {
+																								to: v => values[Math.round(v)] || ""
+																							}
+																						}
+																					});
+
+																					slider.noUiSlider.on('update', function(value) {
+																						const index = Math.round(value);
+																						const current = values[index];
+																						const suffix = index < midIndex ? '-kiri' : (index > midIndex ? '-kanan' : '');
+																						inputHidden.value = current + suffix;
+																					});
+																				})();
+																				</script>
+																				HTML;			
 																		} else {
 																		}
 																		$label = '';
@@ -714,10 +796,10 @@
 																			$label .= ' <span class="text-danger">*</span>';
 																		}
 																		echo '<div class="form-group row" id="pertanyaan_' . $ta->ps_id . '" data-ps-kode="' . $ta->ps_kode . '"> 
-															<label class="col-sm-2 form-control-static" id="' . $ta->ps_kode . '">' . $ta->ps_kode . ' ' . $lnk2 . '</label>
+															<label class="col-sm-2 form-control-static" id="' . $ta->ps_kode . '">' . $ta->ps_kode .  $label .' ' . $lnk2 . '</label>
 															<div class="col-sm-9">
 																<b>'
-																			. str_replace(['<p>', '</p>'], ['<span>', '</span>'], $ta->ps_pertanyaan) . $label .
+																			. str_replace(['<p>', '</p>'], ['<span>', '</span>'], $ta->ps_pertanyaan) .
 																			'</b>
 																' . $pakwar . '
 																

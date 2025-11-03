@@ -46,7 +46,103 @@
     <link rel="stylesheet" href="<?=base_url();?>assets/vendor/libs/node-waves/node-waves.css" />
 
     <!-- Page CSS -->
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/noUiSlider/15.6.1/nouislider.min.css" rel="stylesheet">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/noUiSlider/15.6.1/nouislider.min.js"></script>
 
+    <style>
+
+    .slider-wrapper {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      width: 100%;
+      margin: 0;
+      padding: 0;
+      gap: 0;
+    }
+
+    .slider-label {
+      width: 20%;
+      font-size: 13px;
+      line-height: 1.4;
+      color: #333;
+    }
+
+    .slider-label-left {
+      text-align: center;
+      margin-right: 15px;
+    }
+
+    .slider-label-right {
+      text-align: center;
+      margin-left: 15px;
+      /* margin-right: 0; */
+    }
+
+    .slider-box {
+      width: 50%;
+      text-align: center;
+      margin: 0;
+      padding: 0;
+    }
+
+    .slider-bar {
+      margin: 1px 0;
+    }
+		.slider-label strong {
+			/* display: block; */
+			font-size: 15px;
+			color: #007bff;
+		}
+
+		#slider-combined-options {
+			margin: 20px 0;
+		}
+
+    @media (max-width: 768px) {
+      .slider-wrapper {
+        flex-wrap: wrap;
+        gap: 4px;
+      }
+
+      .slider-label {
+        width: 42%;
+        font-size: 12px;
+      }
+
+      .slider-box {
+        width: 100%;
+        margin-bottom: 15px;
+        order: 3; /* biar slider di baris bawah, penuh */
+      }
+    }
+
+		.noUi-tooltip {
+			background: #007bff;
+			color: #fff;
+			border-radius: 5px;
+			padding: 3px 8px;
+			font-size: 13px;
+		}
+    /* Semua angka pips diperbesar */
+    .noUi-value {
+        font-size: 16px !important;
+        font-weight: 600;
+        color: #333;
+    }
+
+    /* Opsi tambahan: kalau kamu ingin angka 9 tetap sedikit lebih kecil */
+    /* .noUi-value:contains("9") {
+        font-size: 14px !important;
+        opacity: 0.8;
+    } */
+
+    /* Atur jarak antar pips biar rapi */
+    .noUi-pips-horizontal {
+        padding-top: 10px;
+    }
+
+	</style>
     <!-- Helpers -->
     <script src="<?=base_url();?>assets/vendor/js/helpers.js"></script>
 
