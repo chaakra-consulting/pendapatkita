@@ -812,18 +812,28 @@ class Admin extends CI_Controller
 		$pilja = $this->input->post('pilja');
 		$logicja = $this->input->post('logicja');
 		$typeja = $this->input->post('typeja');
-		
 
+		$element = $this->input->post('element');
+		$description = $this->input->post('description');
+		
 		$dataJawaban = '';
 
 		foreach ($pilja as $key => $v) {
 
 			if (count($pilja) > 1) {
 				if ($v != '') {
-					$dataJawaban .= $v . ':' . $logicja[$key] . ':' . $typeja[$key] . ';';
+					$dataJawaban .= $v . ':' . 
+					$logicja[$key] . ':' . 
+					$typeja[$key] . ';';
 				}
 			} else {
 				$dataJawaban = '';
+			}
+		}
+
+		if($tipe == 6){
+			foreach ($element as $key => $p) {
+				$dataJawaban .= $p . ':' . $description[$key] . ':;';
 			}
 		}
 
@@ -864,6 +874,9 @@ class Admin extends CI_Controller
 		$logicja = $this->input->post('logicja');
 		$typeja = $this->input->post('typeja');
 
+		$element = $this->input->post('element');
+		$description = $this->input->post('description');
+
 		$dataJawaban = '';
 
 		// Ambil pilihan lama dalam bentuk array
@@ -887,19 +900,30 @@ class Admin extends CI_Controller
 			$pilja   = array_unique($pilja);
 			$pilja   = array_values($pilja);
 
-			foreach ($pilja as $key => $v) {
-				if ($v !== '') {
-					// Jika ada di pilihan lama → pakai logic & type lama
-					if (isset($old_pilihan[$v])) {
-						$logic = $logicja[$key] ?? $old_pilihan[$v]['logic'];
-						$type  = $typeja[$key] ?? $old_pilihan[$v]['type'];
-					} else {
-						// Jika jawaban baru -> pakai input sekarang (atau default)
-						$logic = $logicja[$key] ?? '';
-						$type  = $typeja[$key] ?? 'default';
-					}
+			if($tipe == 6){
 
-					$dataJawaban .= $v . ':' . $logic . ':' . $type . ';';
+				foreach ($pilja as $key => $p) {
+					$dataJawaban .= $p . ':' . $logicja[$key] . ':;';
+				}
+				
+				foreach ($element as $key => $p) {
+					$dataJawaban .= $p . ':' . $description[$key] . ':;';
+				}
+			}else{
+				foreach ($pilja as $key => $v) {
+					if ($v !== '') {
+						// Jika ada di pilihan lama → pakai logic & type lama
+						if (isset($old_pilihan[$v])) {
+							$logic = $logicja[$key] ?? $old_pilihan[$v]['logic'];
+							$type  = $typeja[$key] ?? $old_pilihan[$v]['type'];
+						} else {
+							// Jika jawaban baru -> pakai input sekarang (atau default)
+							$logic = $logicja[$key] ?? '';
+							$type  = $typeja[$key] ?? 'default';
+						}
+
+						$dataJawaban .= $v . ':' . $logic . ':' . $type . ';';
+					}
 				}
 			}
 		} else {
