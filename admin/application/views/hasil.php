@@ -43,7 +43,7 @@
 		</tr>
 		<tr>
 			<?php foreach ($structured_questions as $q) : ?>
-				<th colspan="<?= $q->colspan ?>" <?= !$q->is_checkbox ? 'rowspan="2"' : '' ?>>
+				<th colspan="<?= $q->colspan ?>" <?= (!$q->is_checkbox && !$q->is_element) ? 'rowspan="2"' : '' ?>>
 					<?= $q->ps_kode ?>
 				</th>
 			<?php endforeach; ?>
@@ -51,6 +51,10 @@
 		<tr>
 			<?php foreach ($structured_questions as $q) : ?>
 				<?php if ($q->is_checkbox) : ?>
+					<?php foreach ($q->options as $option) : ?>
+						<th><?= htmlspecialchars($option) ?></th>
+					<?php endforeach; ?>
+                <?php elseif ($q->is_element) : ?>
 					<?php foreach ($q->options as $option) : ?>
 						<th><?= htmlspecialchars($option) ?></th>
 					<?php endforeach; ?>
@@ -111,6 +115,45 @@
 								?>
 							</td>
 						<?php endforeach; ?>
+                    <?php elseif ($q->is_element) : ?>
+						<?php foreach ($q->options as $index => $option) : ?>
+                            <td>
+                                <?php
+                                if (isset($jawaban_map[$q->ps_id])) {
+                                    $jawaban_lengkap_element = $jawaban_map[$q->ps_id];
+                                    $selected_options = array_map('trim', explode(',', $jawaban_lengkap_element));
+
+                                    foreach ($selected_options as $item_jawaban) {
+                                        // Cek apakah formatnya seperti "4-kiri" atau "4-kanan"
+                                        if (preg_match('/^(\d+)-(kiri|kanan)$/', $item_jawaban, $matches)) {
+                                            $nilai = (int) $matches[1];
+                                            $arah  = $matches[2];
+
+                                            // cari semua posisi angka yang sama di options
+                                            $indexes = array_keys($q->options, $nilai);
+
+                                            if ($indexes) {
+                                                // tentukan index target sesuai arah
+                                                $targetIndex = ($arah === 'kanan' && count($indexes) > 1)
+                                                    ? end($indexes) // ambil yang kanan
+                                                    : $indexes[0];  // ambil yang kiri
+
+                                                // tampilkan hanya pada kolom yang sesuai arah
+                                                if ($index === $targetIndex) {
+                                                    echo $nilai;
+                                                }
+                                            }
+                                        } else {
+                                            // fallback: jika bukan format kiri/kanan, cocokkan langsung
+                                            if ($option == trim($item_jawaban)) {
+                                                echo htmlspecialchars($item_jawaban);
+                                            }
+                                        }
+                                    }
+                                }
+                                ?>
+                            </td>
+                        <?php endforeach; ?>
 					<?php else : ?>
 						<?php // Logika Final untuk Radio Button & Teks 
 						?>
