@@ -21,7 +21,7 @@
 
 /* Specific styles for phone view */
 #device-wrapper.device-phone {
-    max-width: 370px;
+    max-width: 450px;
     margin: 0 auto;
     padding: 1rem;
     font-size: 0.85rem; /* kecilkan semua font dalam wrapper */
@@ -81,6 +81,44 @@
     margin-top: 0.25rem;
     padding: 0.4rem 0.6rem;
 }
+
+/* === Tambahan khusus untuk slider di mode phone === */
+#device-wrapper.device-phone .slider-wrapper {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: 4px;
+    margin-bottom: 1rem;
+}
+
+/* Label kiri dan kanan mengecil, sejajar di atas */
+#device-wrapper.device-phone .slider-label {
+    width: 42%;
+    font-size: 12px;
+    line-height: 1.3;
+}
+
+/* Biar kiri dan kanan tetap sejajar */
+#device-wrapper.device-phone .slider-label-left {
+    text-align: left;
+}
+#device-wrapper.device-phone .slider-label-right {
+    text-align: right;
+}
+
+/* Slider turun ke bawah, penuh */
+#device-wrapper.device-phone .slider-box {
+    order: 3;
+    width: 100%;
+    margin-top: 6px;
+}
+
+/* Tambahan opsional biar tooltip noUiSlider tidak keluar frame */
+#device-wrapper.device-phone .noUi-tooltip {
+    font-size: 10px;
+}
+
 </style>
                 <div class="container">
 					<!-- breadcrumb -->
@@ -609,6 +647,102 @@
                                                                                             }
                                                                                             // $lnk2 = $lnk;
                                                                                         }
+                                                                                        elseif ($ta->ps_tipe_pertanyaan == 6) {
+                                                                                            $pilja = explode(';', $piljab);
+
+                                                                                            $level = '';
+                                                                                            $logic = '';
+                                                                                            $aspectLeft = '';
+                                                                                            $descLeft = '';
+                                                                                            $aspectRight = '';
+                                                                                            $descRight = '';
+                                                                                            foreach ($pilja as $key => $pj) {
+                                                                                                if (trim($pj) === '') continue;
+                                                                                                $pillo = explode(':', $pj);
+                                                                                                //print_r($pillo);exit;
+                
+                                                                                                if($key == 0){
+                                                                                                    $level = $pillo[0] ? trim($pillo[0]) : ''; 
+                                                                                                    $logic = $pillo[1] ? $pillo[1] : ''; 
+                                                                                                    //print_r($key);exit;
+                                                                                                }elseif($key == 1){
+                                                                                                    $aspectLeft = $pillo[0]; 
+                                                                                                    $descLeft = $pillo[1]; 
+                                                                                                    //print_r($aspectLeft);exit;
+                                                                                                }elseif($key == 2){
+                                                                                                    $aspectRight = $pillo[0]; 
+                                                                                                    $descRight = $pillo[1]; 
+                                                                                                    //print_r($descRight);exit;
+                                                                                                }
+                                                                                                //print_r($aspectLeft);exit;
+                                                                                            }
+                                                                                            $pakwar .= <<<HTML
+                                                                                                <div class="slider-wrapper">
+                                                                                                    <!-- KIRI -->
+                                                                                                    <div class="slider-label slider-label-left">
+                                                                                                        <strong>{$aspectLeft}</strong><br>
+                                                                                                        <span>{$descLeft}</span>
+                                                                                                    </div>
+                
+                                                                                                    <!-- SLIDER -->
+                                                                                                    <div class="slider-box">
+                                                                                                        <div id="slider-combined-options-{$ta->ps_id}" style="margin:20px 0;"></div>
+                                                                                                        <input type="hidden" id="slider_value_{$ta->ps_id}" name="{$ta->ps_id}" />
+                                                                                                    </div>
+                
+                                                                                                    <!-- KANAN -->
+                                                                                                    <div class="slider-label slider-label-right">
+                                                                                                        <strong>{$aspectRight}</strong><br>
+                                                                                                        <span>{$descRight}</span>
+                                                                                                    </div>
+                                                                                                </div>
+                
+                                                                                                <script>
+                                                                                                (function() {
+                                                                                                    const level = {$level};
+                                                                                                    const slider = document.getElementById("slider-combined-options-{$ta->ps_id}");
+                                                                                                    if (!slider) return;
+                
+                                                                                                    const values = [];
+                                                                                                    for (let i = level; i >= 1; i--) values.push(i);
+                                                                                                    for (let i = 2; i <= level; i++) values.push(i);
+                
+                                                                                                    if (values.length === 0) return;
+                
+                                                                                                    const inputHidden = document.getElementById("slider_value_{$ta->ps_id}");
+                                                                                                    const midIndex = Math.floor(values.length / 2);
+                
+                                                                                                    let startIndex = midIndex; // default di tengah
+                
+                                                                                                    // Tentukan posisi awal dari nilai PilJabIsi
+                
+                                                                                                    noUiSlider.create(slider, {
+                                                                                                        start: [startIndex],
+                                                                                                        step: 1,
+                                                                                                        range: { min: 0, max: values.length - 1 },
+                                                                                                        tooltips: {
+                                                                                                            to: v => values[Math.round(v)] || ""
+                                                                                                        },
+                                                                                                        pips: {
+                                                                                                            mode: "steps",
+                                                                                                            stepped: true,
+                                                                                                            density: 5,
+                                                                                                            format: {
+                                                                                                                to: v => values[Math.round(v)] || ""
+                                                                                                            }
+                                                                                                        }
+                                                                                                    });
+                
+                                                                                                    slider.noUiSlider.on('update', function(value) {
+                                                                                                        const index = Math.round(value);
+                                                                                                        const current = values[index];
+                                                                                                        const suffix = index < midIndex ? '-kiri' : (index > midIndex ? '-kanan' : '');
+                                                                                                        inputHidden.value = current + suffix;
+                                                                                                    });
+                                                                                                })();
+                                                                                                </script>
+                                                                                                HTML;			
+                                                                                        }
                                                                                         else {
                                                                                         }
                             
@@ -618,10 +752,10 @@
                                                                                         }
                             
                                                                                         echo '<div class="form-group row" id="pertanyaan_' . $ta->ps_id . '" data-ps-kode="' . $ta->ps_kode . '"> 
-                                                                                        <label class="col-sm-2 form-control-static" id="' . $ta->ps_kode . '">' . $ta->ps_kode . ' ' . $lnk2 . '</label>
+                                                                                        <label class="col-sm-2 form-control-static" id="' . $ta->ps_kode . '">' . $ta->ps_kode . $label .' ' . $lnk2 . '</label>
                                                                                         <div class="col-sm-9">
                                                                                             <b>'
-                                                                                                        . str_replace(['<p>', '</p>'], ['<span>', '</span>'], $ta->ps_pertanyaan) . $label .
+                                                                                                        . str_replace(['<p>', '</p>'], ['<span>', '</span>'], $ta->ps_pertanyaan) .
                                                                                                         '</b>
                                                                                             ' . $pakwar . '
                                                                                             
@@ -922,7 +1056,7 @@
 
         // Override width based on device conditions
         if (device === 'phone') {
-            wrapper.style.maxWidth = '370px'; // Typical phone width
+            wrapper.style.maxWidth = '450px'; // Typical phone width
         } else if (device === 'tablet') {
             wrapper.style.maxWidth = '768px'; // Typical tablet width
         }

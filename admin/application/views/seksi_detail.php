@@ -17,6 +17,8 @@ function tipepertanyaan($idtipe)
         $teks = 'Jawaban Panjang';
     } elseif ($idtipe == 5) {
         $teks = 'Skala Likert';
+    } elseif ($idtipe == 6) {
+        $teks = 'Elemen';
     }
     return $teks;
 }
@@ -86,6 +88,7 @@ function tipepertanyaan($idtipe)
                                     <option value="3">Jawaban Singkat</option>
                                     <option value="4">Jawaban Panjang</option>
                                     <option value="5">Skala Likert</option>
+                                    <option value="6">Elemen</option>
                                 </select>
                             </div>
                             <div id="div1" style="display:block;">
@@ -167,6 +170,7 @@ function tipepertanyaan($idtipe)
                                             <option value="persegi">Persegi Rating</option>
                                         </select>
                                     </div>
+                                    <input type="hidden" id="logicja" name="logicja[]">
                                     <div class="col-sm-4">
                                         <p class="form-control-static"><input type="text" class="form-control" id="pilja" name="pilja[]" placeholder="Tulis Teks Range"></p>
                                     </div>
@@ -175,6 +179,35 @@ function tipepertanyaan($idtipe)
                                     </div>
                                 </div>
                                 <div id="PilLikertContainer"></div>
+                            </div>
+                            <div id="div6" style="display:none;">
+                                <div class="form-group row">
+                                    <label class="col-sm-3 control-label">Elemen Kiri</label>
+                                    <div class="col-sm-3">
+                                        <p class="form-control-static"><input type="text" class="form-control" id="element" name="element[]" placeholder="Aspek"></p>
+                                    </div>
+                                    <div class="col-sm-5">
+                                        <p class="form-control-static"><input type="text" class="form-control" id="description" name="description[]" placeholder="Deskripsi"></p>
+                                    </div>
+                                </div>
+                                <div class="form-group row">
+                                    <label class="col-sm-3 control-label">Elemen Kanan</label>
+                                    <div class="col-sm-3">
+                                        <p class="form-control-static"><input type="text" class="form-control" id="element" name="element[]" placeholder="Aspek"></p>
+                                    </div>
+                                    <div class="col-sm-5">
+                                        <p class="form-control-static"><input type="text" class="form-control" id="description" name="description[]" placeholder="Deskripsi"></p>
+                                    </div>
+                                </div>
+                                <div class="form-group row">
+                                    <label class="col-sm-3 control-label">Tingkat Preferensi</label>
+                                    <div class="col-sm-4">
+                                        <p class="form-control-static"><input type="number" class="form-control" id="pilja" name="pilja[]" placeholder="Tingkat"></p>
+                                    </div>
+                                    <div class="col-sm-4">
+                                        <p class="form-control-static"><input type="text" class="form-control" id="logicja" name="logicja[]" placeholder="Logic"></p>
+                                    </div>
+                                </div>
                             </div>
 
                         </div>
@@ -231,6 +264,7 @@ function tipepertanyaan($idtipe)
                                     <option value="3"<?= $lu->ps_tipe_pertanyaan == '3' ? 'selected' : '' ?>>Jawaban Singkat</option>
                                     <option value="4"<?= $lu->ps_tipe_pertanyaan == '4' ? 'selected' : '' ?>>Jawaban Panjang</option>
                                     <option value="5"<?= $lu->ps_tipe_pertanyaan == '5' ? 'selected' : '' ?>>Skala Likert</option>
+                                    <option value="6"<?= $lu->ps_tipe_pertanyaan == '6' ? 'selected' : '' ?>>Elemen</option>
                                 </select>
                                 <?php if ($is_jawaban == 1): ?>
                                 <input type="hidden" name="tipePertanyaan<?= $lu->ps_id ?>" value="<?= $lu->ps_tipe_pertanyaan ?>">
@@ -397,6 +431,64 @@ function tipepertanyaan($idtipe)
                                 <!-- <div class="col-sm-3">
                                     <p><button type="button" class="btn btn-default btn-block" onclick="extraInpTextAreaEdit('<?= $lu->ps_id ?>')" style="margin-top:6px;"><i class="fa fa-plus"></i> Tambahkan Logic</button></p>
                                 </div> -->
+                            </div>
+                            <div id="div6<?= $lu->ps_id ?>" >
+                                <?php
+                                $piljas = explode(';', rtrim($lu->ps_pilihan_jawaban, ';'));
+                                // print_r($lu->ps_pilihan_jawaban);exit;
+                                $pilja = '';
+                                $logic = '';
+
+                                $element1 = '';
+                                $description1 = '';
+
+                                $element2 = '';
+                                $description2 = '';
+
+                                foreach ($piljas as $key => $pj) {
+                                    if (trim($pj) === '') continue;
+
+                                    $parts = explode(':', $pj, 3);
+
+                                    if ($key === 0) {
+                                        $pilja = trim($parts[0] ?? '');
+                                        $logic = trim($parts[1] ?? '');
+                                    } elseif ($key === 1){
+                                        $element1 = trim($parts[0] ?? '');
+                                        $description1 = trim($parts[1] ?? '');
+                                    } elseif ($key === 2){
+                                        $element2 = trim($parts[0] ?? '');
+                                        $description2 = trim($parts[1] ?? '');
+                                    }
+                                }                                                                  
+                                ?>
+                                <div class="form-group row">
+                                    <label class="col-sm-3 control-label">Elemen Kiri</label>
+                                    <div class="col-sm-3">
+                                        <p class="form-control-static"><input type="text" class="form-control" id="element" name="element[]" value ="<?= $element1 ?>" placeholder="Aspek"></p>
+                                    </div>
+                                    <div class="col-sm-5">
+                                        <p class="form-control-static"><input type="text" class="form-control" id="description" name="description[]" value ="<?= $description1 ?>" placeholder="Deskripsi"></p>
+                                    </div>
+                                </div>
+                                <div class="form-group row">
+                                    <label class="col-sm-3 control-label">Elemen Kanan</label>
+                                    <div class="col-sm-3">
+                                        <p class="form-control-static"><input type="text" class="form-control" id="element" name="element[]" value ="<?= $element2 ?>" placeholder="Aspek"></p>
+                                    </div>
+                                    <div class="col-sm-5">
+                                        <p class="form-control-static"><input type="text" class="form-control" id="description" name="description[]" value ="<?= $description2 ?>" placeholder="Deskripsi"></p>
+                                    </div>
+                                </div>
+                                <div class="form-group row">
+                                    <label class="col-sm-3 control-label">Tingkat Preferensi</label>
+                                    <div class="col-sm-4">
+                                    <input type="number" class="form-control" id="pilja" name="pilja[]" value="<?= trim($pilja) ?>" placeholder="Tingkat">
+                                    </div>
+                                    <div class="col-sm-4">
+                                        <p class="form-control-static"><input type="text" class="form-control" id="logicja" name="logicja[]" value ="<?= $logic ?> "placeholder="Logic"></p>
+                                    </div>
+                                </div>
                             </div>
                             <div id="div5<?= $lu->ps_id ?>" style="display:none;">
                                 <div class="form-group row">
@@ -702,6 +794,10 @@ function tipepertanyaan($idtipe)
         {
             displayDiv(prefix, "5");
         }
+        if (selectedOption == "6") //Elemen
+        {
+            displayDiv(prefix, "6");
+        }
     }
 
     function handleTipePertanyaanChange(selectEl) {
@@ -724,7 +820,7 @@ function tipepertanyaan($idtipe)
     }
 
     function showDivEdit(prefix, chooser, ps_id) {
-        for (var i = 1; i <= 5; i++) {
+        for (var i = 1; i <= 6; i++) {
             var div = document.getElementById(prefix + i + ps_id);
             if (div) {
                 div.style.display = 'none';
@@ -735,7 +831,7 @@ function tipepertanyaan($idtipe)
         }
 
         var selectedOption = chooser.value;
-        if (["1", "2", "3", "4", "5"].includes(selectedOption)) {
+        if (["1", "2", "3", "4", "5", "6"].includes(selectedOption)) {
             var targetDiv = document.getElementById(prefix + selectedOption + ps_id);
             if (targetDiv) {
                 targetDiv.style.display = 'block';
