@@ -202,7 +202,7 @@ function tipepertanyaan($idtipe)
                                 <div class="form-group row">
                                     <label class="col-sm-3 control-label">Tingkat Preferensi</label>
                                     <div class="col-sm-4">
-                                        <p class="form-control-static"><input type="number" class="form-control" id="pilja" name="pilja[]" value="9" placeholder="Tingkat"></p>
+                                        <p class="form-control-static"><input type="number" class="form-control" id="pilja" name="pilja[]" placeholder="Tingkat"></p>
                                     </div>
                                     <div class="col-sm-4">
                                         <p class="form-control-static"><input type="text" class="form-control" id="logicja" name="logicja[]" placeholder="Logic"></p>
