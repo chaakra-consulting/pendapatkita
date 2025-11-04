@@ -455,6 +455,7 @@ class Admin extends CI_Controller
 						'ps_kode' => $q->ps_kode,
 						'ps_id_seksi' => $q->ps_id_seksi,
 						'is_checkbox' => $q->ps_tipe_pertanyaan == '2',
+						'is_element' => $q->ps_tipe_pertanyaan == '6',
 						'options' => [],
 						'essay_option' => null, // 👈 Tambahkan properti ini
 						'colspan' => 1
@@ -465,7 +466,7 @@ class Admin extends CI_Controller
 						$options_list = [];
 						$pilihan = explode(';', rtrim($q->ps_pilihan_jawaban, ';'));
 
-						foreach ($pilihan as $pil) {
+						foreach ($pilihan as $key => $pil) {
 							if (!empty($pil)) {
 								$parts = explode(':', $pil); // [0] = Teks, [1] = Logic, [2] = Tipe (default/essai)
 								$option_text = $parts[0];
@@ -473,7 +474,17 @@ class Admin extends CI_Controller
 
 								// Cek jika ini adalah opsi yang memicu esai
 								if (isset($parts[2]) && $parts[2] == 'essai') {
-									$question_data['essay_option'] = $option_text; // 👈 Simpan nama opsi esai
+									$question_data['essay_option'] = $option_text;
+								}
+
+								if ($question_data['is_element'] && $key == 0) {
+									$options = [];
+									$index = 0;
+									for ($i = $option_text; $i >= 1; $i--) $options[$index++] = $i;
+									for ($i = 2; $i <= $option_text; $i++) $options[$index++] = $i;
+									
+									$question_data['options'] = $options;
+									$question_data['colspan'] = count($options) > 0 ? count($options) : 1;
 								}
 							}
 						}
@@ -496,7 +507,7 @@ class Admin extends CI_Controller
 					$seksi->jumlah = isset($seksi_col_count[$seksi->id_seksi]) ? $seksi_col_count[$seksi->id_seksi] : 0;
 				}
 				$data['listseksi'] = $listseksi;
-
+				//print_r($structured_questions);exit;
 				$this->load->view('hasil', $data);
 			}
 		}
